@@ -1,59 +1,164 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Compra de Ingressos</title>
+  <meta charset="UTF-8">
+  <title>Formulário de Ingresso - Stamm 2025</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; }
+    label { display: block; margin-top: 1rem; }
+    input, select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.3rem; }
+    button { margin-top: 1.5rem; padding: 0.7rem 1.2rem; }
+    .hidden { display: none; }
+    .error { color: red; margin-top: 0.3rem; }
+  </style>
 </head>
 <body>
-  <h1>Compre seu ingresso</h1>
-  <iframe id="formulario" width="100%" height="800" frameborder="0"></iframe>
-   <script>
-    async function obterTokenDoLote() {
-      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHRMwVh-s3otYgaFoLhRzj7h3f-oyF8Dojf3fc6Pqlf1AX-fS3CqrNuspRRd5MQNb7x1DK6KfiO5pQ/pubhtml?gid=736107426&single=true";
-    
+  <h2>Formulário de Ingresso - Stamm 2025</h2>
+
+  <form id="formulario">
+    <label>Nome Completo:
+      <input type="text" name="nome" required>
+    </label>
+
+    <label>Telefone / WhatsApp (com DDD):
+      <input type="tel" name="telefone" required pattern="\\d{2} \\d{8,9}" placeholder="47 991234567">
+      <div class="error" id="erro-ddd" style="display: none;">DDD diferente de 47. Verifique se digitou corretamente.</div>
+    </label>
+
+    <label>Data de nascimento:
+      <input type="date" name="nascimento" required>
+      <div class="error" id="erro-idade" style="display: none;">Você precisa ter mais de 18 anos.</div>
+    </label>
+
+    <label>Quem te convidou?
+      <select name="convidado" required>
+        <option value="">Selecione</option>
+        <option value="Mikke">Mikke</option>
+        <option value="Rian">Rian</option>
+        <option value="Milly">Milly</option>
+      </select>
+    </label>
+
+    <label>Tamanho da camiseta:
+      <select name="camiseta" required>
+        <option value="">Selecione</option>
+        <option value="P">P</option>
+        <option value="M">M</option>
+        <option value="G">G</option>
+      </select>
+    </label>
+
+    <label>Gênero:
+      <select name="genero" id="genero" required>
+        <option value="">Selecione</option>
+        <option value="Masculino">Masculino</option>
+        <option value="Feminino">Feminino</option>
+        <option value="Outro">Outro</option>
+      </select>
+    </label>
+
+    <label id="genero-outro-label" class="hidden">Descreva:
+      <input type="text" name="genero_outro">
+    </label>
+
+    <label>Opção do entrevero:
+      <select name="entrevero" required>
+        <option value="">Selecione</option>
+        <option value="Carne">Carne</option>
+        <option value="Vegano">Vegano</option>
+      </select>
+    </label>
+
+    <label>Forma de pagamento:
+      <select name="pagamento" required>
+        <option value="">Selecione</option>
+        <option value="PIX">PIX</option>
+        <option value="2x via PIX (entrada + 2ª até 02/08)">2x via PIX (entrada + 2ª até 02/08)</option>
+      </select>
+    </label>
+
+    <label>Observação:
+      <textarea name="observacao" rows="3"></textarea>
+    </label>
+
+    <input type="hidden" name="lote" id="lote">
+
+    <button type="submit">Enviar</button>
+  </form>
+
+  <script>
+    const form = document.getElementById("formulario");
+    const genero = document.getElementById("genero");
+    const generoOutroLabel = document.getElementById("genero-outro-label");
+    const erroDDD = document.getElementById("erro-ddd");
+    const erroIdade = document.getElementById("erro-idade");
+
+    genero.addEventListener("change", () => {
+      generoOutroLabel.classList.toggle("hidden", genero.value !== "Outro");
+    });
+
+    function validarIdade(dataNascimento) {
+      const hoje = new Date();
+      const nascimento = new Date(dataNascimento);
+      const idade = hoje.getFullYear() - nascimento.getFullYear();
+      const m = hoje.getMonth() - nascimento.getMonth();
+      return idade > 18 || (idade === 18 && m >= 0);
+    }
+
+    function validarDDD(telefone) {
+      return telefone.trim().startsWith("47");
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const dados = Object.fromEntries(new FormData(form).entries());
+
+      erroDDD.style.display = validarDDD(dados.telefone) ? "none" : "block";
+      erroIdade.style.display = validarIdade(dados.nascimento) ? "none" : "block";
+
+      if (!validarDDD(dados.telefone) || !validarIdade(dados.nascimento)) return;
+
+      if (dados.genero === "Outro") {
+        dados.genero = dados.genero_outro;
+      }
+      delete dados.genero_outro;
+
+      const resposta = await fetch("SUA_URL_DO_APPS_SCRIPT", {
+        method: "POST",
+        body: JSON.stringify(dados),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      const resultado = await resposta.json();
+      if (resultado.status === "ok") {
+        alert("Formulário enviado com sucesso!");
+        form.reset();
+        generoOutroLabel.classList.add("hidden");
+      } else {
+        alert("Erro ao enviar o formulário.");
+      }
+    });
+
+    // Preenche o lote automaticamente via JS
+    async function obterLote() {
       try {
-        const res = await fetch(url);
+        const res = await fetch("URL_DA_PLANILHA_PUBHTML");
         const html = await res.text();
-    
-        // Cria DOM virtual para processar o HTML remoto
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-    
-        // Acha a tabela principal publicada
+        const doc = new DOMParser().parseFromString(html, "text/html");
         const tabela = doc.querySelector("table.waffle");
-    
-        // Pega a segunda linha da tabela (linha 2 = índice 1)
-        const segundaLinha = tabela.querySelectorAll("tr")[2];
-        console.log(segundaLinha);
-        // Pega a primeira célula da segunda linha (coluna 1 = índice 0)
-        const celula = segundaLinha.querySelectorAll("td")[0];
-        console.log(celula);
-        // Extrai o conteúdo
-        const token = celula.textContent.trim().replace(/^"|"$/g, ''); // remove aspas
-    
-        console.log("Token do lote:", token);
-        return token;
+        const linha = tabela.querySelectorAll("tr")[2];
+        const celula = linha.querySelector("td");
+        const token = celula.textContent.trim().replace(/^"|"$/g, '');
+        document.getElementById("lote").value = token;
       } catch (e) {
-        console.error("Erro ao buscar token do lote:", e);
-        return null;
+        console.error("Erro ao buscar lote:", e);
       }
     }
-    
-    // Exemplo de uso: carregar formulário com token
-    async function carregarFormularioComToken() {
-      const campoLoteID = "entry.535997233"; // Substituir pelo real
-      const linkBase = "https://docs.google.com/forms/d/e/1FAIpQLSeY8P7aZdNirs-qWvh5elfvWrnaknSHxohWRYbZeH77cqecfg/viewform";
-    
-      const token = await obterTokenDoLote();
-      console.log(token);
-      if (token) {
-        const url = `${linkBase}?${campoLoteID}=${encodeURIComponent(token)}`;
-        console.log(url);
-        document.getElementById("formulario").src = url;
-      }
-    }
-    
-    carregarFormularioComToken();
+
+    obterLote();
   </script>
 </body>
 </html>
