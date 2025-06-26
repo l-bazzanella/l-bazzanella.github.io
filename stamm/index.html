@@ -1,5 +1,5 @@
-
-  <!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Formulário Ingresso</title>
@@ -235,8 +235,8 @@ button[type="submit"] {
   </div>
     </div>
   <div class="descricao-evento">
-      Lote: <b>Promocional</b></br>
-      Valor: <b>R$ 100</b>
+      Lote: <b><span id="promo-name"> </span></b></br>
+      Valor: <b>R$ <span id="preco"> </span></b>
   </div>
 
 <div id="mensagem-sucesso" style="display: none; text-align: center; padding: 30px;">
@@ -329,14 +329,15 @@ button[type="submit"] {
       </div>
     </div>
   <script>
-
-
+    
     window.addEventListener('DOMContentLoaded', async () => {
-        const infoLote = await fetch("https://script.google.com/macros/s/AKfycbzdrxuGOGomrowMgRH29Xr7_UcJQIkwLS0qGI4RBx99SRvvz2kNWoMTl6iiU29vaauLtQ/exec")
+        const infoLote = await fetch("https://script.google.com/macros/s/AKfycbxTRxMi9Ta6xlKp3IsDMxqQBG0zC9uFxjUW1oMBHGdQ2W1bS7XpuLK9lRg1Qyl-Qlr_hQ/exec")
             .then(r => r.json())
-            .catch(() => ({ token: null, isPromo: null }));
+            .catch(() => ({ token: null, isPromo: null, price:null }));
 
         document.getElementById("lote").value = infoLote.token;
+        document.getElementById("preco").innerText = infoLote.price;
+        document.getElementById("promo-name").innerText = infoLote.promoName;
 
         if (infoLote.isPromo) {
             const pagamento = document.getElementById('pagamento');
@@ -346,9 +347,17 @@ button[type="submit"] {
 
     });
     
-    
-    const promo = false;
-    
+    function toggleOutroGenero() {
+        const outroRadio = document.getElementById('genero_outro_radio');
+        const outroContainer = document.getElementById('genero_outro_container');
+        if (outroRadio.checked) {
+            outroContainer.style.display = 'block';
+        } else {
+            outroContainer.style.display = 'none';
+            document.getElementById('genero_outro').value = '';
+        }
+    }
+        
     function validarEEnviar(e) {
     e.preventDefault();
     const botao = document.querySelector('button[type="submit"]');
@@ -381,7 +390,7 @@ button[type="submit"] {
         lote
     });
                         //https://script.google.com/macros/s/AKfycbzYH6E7f-SVD4gpFVNgry0tjaiuuYkZR9fEMUJlSppQpFfPhy5ZSeTAjtB3dviJiSQWag/exec
-  const googleScriptURL = "https://script.google.com/macros/s/AKfycbzYH6E7f-SVD4gpFVNgry0tjaiuuYkZR9fEMUJlSppQpFfPhy5ZSeTAjtB3dviJiSQWag/exec";
+  const googleScriptURL = "https://script.google.com/macros/s/AKfycbyBQAZdA897hWCaj981VKfd_kMI3uoDWKTVXm_srUSz_AUdq9ny7SSX6JjzMNICd94BCA/exec";
 
     fetch(`${googleScriptURL}?${params.toString()}`)
         .then(response => response.json())
@@ -397,66 +406,6 @@ button[type="submit"] {
             console.error("Erro:", error);
             alert("Erro ao enviar. Tente novamente.");
         });
-    }
-    
-    async function obterTokenDoLote() {
-      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHRMwVh-s3otYgaFoLhRzj7h3f-oyF8Dojf3fc6Pqlf1AX-fS3CqrNuspRRd5MQNb7x1DK6KfiO5pQ/pubhtml?gid=736107426&single=true";
-    
-      try {
-        const res = await fetch(url);
-        const html = await res.text();
-    
-        // Cria DOM virtual para processar o HTML remoto
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-    
-        // Acha a tabela principal publicada
-        const tabela = doc.querySelector("table.waffle");
-    
-        // Pega a segunda linha da tabela (linha 2 = índice 1)
-        const segundaLinha = tabela.querySelectorAll("tr")[2];
-
-        // Pega a primeira célula da segunda linha (coluna 1 = índice 0)
-        const celula = segundaLinha.querySelectorAll("td")[0];
-    
-        // Extrai o conteúdo
-        const token = celula.textContent.trim().replace(/^"|"$/g, ''); // remove aspas
-
-        return token;
-      } catch (e) {
-        console.error("Erro ao buscar token do lote:", e);
-        return null;
-      }
-    }
-    
-    async function isPromo() {
-      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHRMwVh-s3otYgaFoLhRzj7h3f-oyF8Dojf3fc6Pqlf1AX-fS3CqrNuspRRd5MQNb7x1DK6KfiO5pQ/pubhtml?gid=736107426&single=true";
-    
-      try {
-        const res = await fetch(url);
-        const html = await res.text();
-    
-        // Cria DOM virtual para processar o HTML remoto
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-    
-        // Acha a tabela principal publicada
-        const tabela = doc.querySelector("table.waffle");
-    
-        // Pega a segunda linha da tabela (linha 2 = índice 1)
-        const segundaLinha = tabela.querySelectorAll("tr")[3];
-    
-        // Pega a primeira célula da segunda linha (coluna 1 = índice 0)
-        const celula = segundaLinha.querySelectorAll("td")[0];
-
-        // Extrai o conteúdo
-        const isPromo = celula.textContent.trim().replace(/^"|"$/g, ''); // remove aspas
-
-        return isPromo === "TRUE" ? true : false;
-      } catch (e) {
-        console.error("Erro ao buscar status do lote:", e);
-        return null;
-      }
     }
   </script>
 </body>
