@@ -15,6 +15,7 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -22,9 +23,11 @@ body {
   background-size: cover;
   font-family: 'Roboto', sans-serif;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  justify-content: flex-start;
+  align-items: center;
   padding: 20px;
+  flex-direction: column;
+
 }
 
 .form-body-theme {
@@ -121,7 +124,16 @@ button[type="submit"] {
     font-size: 18px;
   }
 }
-
+.outer-footer {
+  position: relative;
+  padding-top: 25vh;
+  width: 100vw;
+}
+    
+.outer-footer {
+  position: relative;
+  padding-top: 25vw;
+}
   </style>
 </head>
 <body>
@@ -284,6 +296,11 @@ button[type="submit"] {
       <button type="submit">Enviar</button>
     </form>
   </div>
+    <div class="outer-footer">
+      <div class="inner-footer">
+        "Alguma mensagem que pareça algo extremamente Profissional - AAASC - 2025"
+      </div>
+    </div>
   <script>
 
 
