@@ -146,8 +146,9 @@
     });
 
     // Preencher o lote automaticamente com um token fixo ou via fetch se quiser buscar online
-    document.getElementById("lote").value = await obterTokenDoLote();
-    
+    async fucntion getToken() {
+      document.getElementById("lote").value = await obterTokenDoLote();
+    }
     async function obterTokenDoLote() {
       const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHRMwVh-s3otYgaFoLhRzj7h3f-oyF8Dojf3fc6Pqlf1AX-fS3CqrNuspRRd5MQNb7x1DK6KfiO5pQ/pubhtml?gid=736107426&single=true";
     
