@@ -24,10 +24,10 @@
     
         // Pega a segunda linha da tabela (linha 2 = índice 1)
         const segundaLinha = tabela.querySelectorAll("tr")[1];
-    
+        console.log(segundaLinha);
         // Pega a primeira célula da segunda linha (coluna 1 = índice 0)
         const celula = segundaLinha.querySelectorAll("td")[0];
-    
+        console.log(celula);
         // Extrai o conteúdo
         const token = celula.textContent.trim().replace(/^"|"$/g, ''); // remove aspas
     
@@ -45,6 +45,7 @@
       const linkBase = "https://docs.google.com/forms/d/e/1FAIpQLSeY8P7aZdNirs-qWvh5elfvWrnaknSHxohWRYbZeH77cqecfg/viewform";
     
       const token = await obterTokenDoLote();
+      console.log(token);
       if (token) {
         const url = `${linkBase}?usp=pp_url&${campoLoteID}=${encodeURIComponent(token)}`;
         document.getElementById("formulario").src = url;
