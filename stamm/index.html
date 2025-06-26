@@ -125,7 +125,7 @@
       delete dados.genero_outro;
 
       try {
-        const resposta = await fetch("https://script.google.com/macros/s/AKfycbyFrhVTnpGrctM25FZ7wBqU4O4NZP5g02OlGPOKPwtRE7Vu_Qnn6GJKXuaWS_Hq4BRN0w/exec", {
+        const resposta = await fetch("https://aaasc.net.br/api/formExecution", {
           method: "POST",
           body: JSON.stringify(dados),
           headers: { "Content-Type": "application/json" }
