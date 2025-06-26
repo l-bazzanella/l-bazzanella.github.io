@@ -146,7 +146,39 @@
     });
 
     // Preencher o lote automaticamente com um token fixo ou via fetch se quiser buscar online
-    document.getElementById("lote").value = "TOKEN_LOTE_ATUAL";
+    document.getElementById("lote").value = await obterTokenDoLote();
+    
+    async function obterTokenDoLote() {
+      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHRMwVh-s3otYgaFoLhRzj7h3f-oyF8Dojf3fc6Pqlf1AX-fS3CqrNuspRRd5MQNb7x1DK6KfiO5pQ/pubhtml?gid=736107426&single=true";
+    
+      try {
+        const res = await fetch(url);
+        const html = await res.text();
+    
+        // Cria DOM virtual para processar o HTML remoto
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+    
+        // Acha a tabela principal publicada
+        const tabela = doc.querySelector("table.waffle");
+    
+        // Pega a segunda linha da tabela (linha 2 = índice 1)
+        const segundaLinha = tabela.querySelectorAll("tr")[2];
+        console.log(segundaLinha);
+        // Pega a primeira célula da segunda linha (coluna 1 = índice 0)
+        const celula = segundaLinha.querySelectorAll("td")[0];
+        console.log(celula);
+        // Extrai o conteúdo
+        const token = celula.textContent.trim().replace(/^"|"$/g, ''); // remove aspas
+    
+        console.log("Token do lote:", token);
+        return token;
+      } catch (e) {
+        console.error("Erro ao buscar token do lote:", e);
+        return null;
+      }
+    }
+    
   </script>
 </body>
 </html>
