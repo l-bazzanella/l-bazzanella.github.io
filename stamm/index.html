@@ -21,7 +21,7 @@
     </label>
 
     <label>Telefone / WhatsApp (com DDD):
-      <input type="tel" name="telefone" required pattern="\\d{2} \\d{8,9}" placeholder="47 991234567">
+      <input type="tel" name="telefone" required placeholder="47 991234567" pattern="\d{2} \d{8,9}">
       <div class="error" id="erro-ddd" style="display: none;">DDD diferente de 47. Verifique se digitou corretamente.</div>
     </label>
 
@@ -124,41 +124,29 @@
       }
       delete dados.genero_outro;
 
-      const resposta = await fetch("SUA_URL_DO_APPS_SCRIPT", {
-        method: "POST",
-        body: JSON.stringify(dados),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
+      try {
+        const resposta = await fetch("https://script.google.com/macros/s/AKfycbyFrhVTnpGrctM25FZ7wBqU4O4NZP5g02OlGPOKPwtRE7Vu_Qnn6GJKXuaWS_Hq4BRN0w/exec", {
+          method: "POST",
+          body: JSON.stringify(dados),
+          headers: { "Content-Type": "application/json" }
+        });
 
-      const resultado = await resposta.json();
-      if (resultado.status === "ok") {
-        alert("Formulário enviado com sucesso!");
-        form.reset();
-        generoOutroLabel.classList.add("hidden");
-      } else {
-        alert("Erro ao enviar o formulário.");
+        const resultado = await resposta.json();
+        if (resultado.status === "ok") {
+          alert("Formulário enviado com sucesso!");
+          form.reset();
+          generoOutroLabel.classList.add("hidden");
+        } else {
+          alert("Erro ao enviar o formulário.");
+        }
+      } catch (erro) {
+        alert("Erro de conexão ao enviar o formulário.");
+        console.error(erro);
       }
     });
 
-    // Preenche o lote automaticamente via JS
-    async function obterLote() {
-      try {
-        const res = await fetch("URL_DA_PLANILHA_PUBHTML");
-        const html = await res.text();
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const tabela = doc.querySelector("table.waffle");
-        const linha = tabela.querySelectorAll("tr")[2];
-        const celula = linha.querySelector("td");
-        const token = celula.textContent.trim().replace(/^"|"$/g, '');
-        document.getElementById("lote").value = token;
-      } catch (e) {
-        console.error("Erro ao buscar lote:", e);
-      }
-    }
-
-    obterLote();
+    // Preencher o lote automaticamente com um token fixo ou via fetch se quiser buscar online
+    document.getElementById("lote").value = "TOKEN_LOTE_ATUAL";
   </script>
 </body>
 </html>
