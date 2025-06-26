@@ -320,17 +320,18 @@ button[type="submit"] {
   const googleScriptURL = "https://script.google.com/macros/s/AKfycbxHhwbknea0nnHx8WtBrb6Sset8S6PYqh2QX6VpuCQkE1_b9utbVFhxf5PdXxr5_5uq4w/exec";
 
   fetch(`${googleScriptURL}?${params.toString()}`)
-    .then(response => {
-      if (response.ok) {
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "ok") {
         document.querySelector("form").style.display = "none";
         document.getElementById("mensagem-sucesso").style.display = "block";
       } else {
-        alert("Erro ao enviar. Tente novamente mais tarde.");
+        alert("Erro inesperado ao enviar.");
       }
     })
     .catch(error => {
       console.error("Erro:", error);
-      alert("Erro ao enviar. Tente novamente." + error);
+      alert("Erro ao enviar. Tente novamente.");
     });
 }
   </script>
