@@ -221,7 +221,7 @@ button[type="submit"] {
 
 <div id="mensagem-sucesso" style="display: none; text-align: center; padding: 30px;">
   <h2 style="color: green;">✅ Inscrição enviada com sucesso!</h2>
-  <p>Verifique com seu contato se o comprovante foi recebido. Você pode fechar essa página agora.</p>
+  <p>Você pode fechar ou atualizar esta pagina para uma nova compra.</p>
 </div>
 
 
@@ -288,9 +288,12 @@ button[type="submit"] {
 
 
 
-    function validarEEnviar(e) {
+function validarEEnviar(e) {
   e.preventDefault();
-
+  const botao = document.querySelector('button[type="submit"]');
+  botao.disabled = true;
+  botao.innerText = 'Enviando...';
+  
   const nome = document.getElementById("nome").value.trim();
   const telefone = document.getElementById("telefone").value.trim();
   const nascimento = document.getElementById("nascimento").value;
