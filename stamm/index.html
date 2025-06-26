@@ -7,24 +7,51 @@
 <body>
   <h1>Compre seu ingresso</h1>
   <iframe id="formulario" width="100%" height="800" frameborder="0"></iframe>
-
-  <script>
-    const campoLoteID = "entry.entry.535997233"; // Substituir pelo ID real do campo Lote
-    const linkBase = "https://docs.google.com/forms/d/e/1FAIpQLSeY8P7aZdNirs-qWvh5elfvWrnaknSHxohWRYbZeH77cqecfg/viewform"; // Substituir pelo ID do seu Formulário
-
-    async function carregarFormulario() {
+   <script>
+    async function obterTokenDoLote() {
+      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHRMwVh-s3otYgaFoLhRzj7h3f-oyF8Dojf3fc6Pqlf1AX-fS3CqrNuspRRd5MQNb7x1DK6KfiO5pQ/pubhtml?gid=736107426&single=true";
+    
       try {
-        const res = await fetch('lote.php');
-        const data = await res.json();
-        const lote = data.lote;
-        const url = `${linkBase}?${campoLoteID}=${encodeURIComponent(lote)}`;
-        document.getElementById("formulario").src = url;
+        const res = await fetch(url);
+        const html = await res.text();
+    
+        // Cria DOM virtual para processar o HTML remoto
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+    
+        // Acha a tabela principal publicada
+        const tabela = doc.querySelector("table.waffle");
+    
+        // Pega a segunda linha da tabela (linha 2 = índice 1)
+        const segundaLinha = tabela.querySelectorAll("tr")[1];
+    
+        // Pega a primeira célula da segunda linha (coluna 1 = índice 0)
+        const celula = segundaLinha.querySelectorAll("td")[0];
+    
+        // Extrai o conteúdo
+        const token = celula.textContent.trim().replace(/^"|"$/g, ''); // remove aspas
+    
+        console.log("Token do lote:", token);
+        return token;
       } catch (e) {
-        console.error("Erro ao buscar o lote:", e);
+        console.error("Erro ao buscar token do lote:", e);
+        return null;
       }
     }
-
-    carregarFormulario();
+    
+    // Exemplo de uso: carregar formulário com token
+    async function carregarFormularioComToken() {
+      const campoLoteID = "entry.535997233"; // Substituir pelo real
+      const linkBase = "https://docs.google.com/forms/d/e/1FAIpQLSeY8P7aZdNirs-qWvh5elfvWrnaknSHxohWRYbZeH77cqecfg/viewform";
+    
+      const token = await obterTokenDoLote();
+      if (token) {
+        const url = `${linkBase}?usp=pp_url&${campoLoteID}=${encodeURIComponent(token)}`;
+        document.getElementById("formulario").src = url;
+      }
+    }
+    
+    carregarFormularioComToken();
   </script>
 </body>
 </html>
