@@ -3,10 +3,173 @@
 <head>
   <meta charset="UTF-8" />
   <title>Formulário Ingresso</title>
+<!-- Fonte Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg-url: url('https://i.ibb.co/4R3YDxxH/background.jpg');
+    }
+    body {
+      background: var(--bg-url) no-repeat center center fixed !important;
+      background-size: cover;
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .logo-evento {
+      margin-top: 30px;
+      margin-bottom: 50px;
+      width: 100%;
+      display: grid;
+      justify-content: center;
+    }
+
+    .logo-evento-img {
+      max-width: 380px;
+    }
+
+    .descricao-evento {
+    color: #234327;
+    background-color: rgb(210 167 110 / 49%);
+    padding: 20px;
+    max-width: 600px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+    font-family: 'Roboto';
+    font-weight: 400;
+    font-size: 11pt;
+    line-height: 1.5;
+    letter-spacing: 0;
+    text-align: justify;
+    }
+
+    form {
+      background: rgba(0,0,0,0);
+      width: 100%;
+    }
+
+    .form-body-theme {
+      width: 100%;
+      padding: 30px 40px;
+      border-radius: 8px;
+      max-width: 580px;
+      margin-top: -30px;
+      background-color: #ede6d8;
+      border: 7px solid #d2a76e;
+      box-shadow: 0 8px 16px rgba(0,0,0);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #222;
+      font-weight: 700;
+      font-size: 1.8rem;
+      user-select: none;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 14px;
+      font-weight: 700;
+      color: #36643b;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border: 1.8px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      font-family: 'Roboto', sans-serif;
+      resize: vertical;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #0b74de;
+      outline: none;
+      box-shadow: 0 0 5px #0b74deaa;
+    }
+
+    input:invalid, select:invalid, textarea:invalid {
+      border-color: #e03e3e;
+    }
+
+    fieldset {
+      border: none;
+      margin-bottom: 20px;
+      padding: 0;
+    }
+
+    legend {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #444;
+    }
+
+    fieldset label {
+      display: inline-block;
+      margin-right: 18px;
+      font-weight: 400;
+      cursor: pointer;
+      color: #444;
+      user-select: none;
+    }
+
+    #genero_outro_container {
+      margin-top: 10px;
+    }
+
+    button[type="submit"] {
+      display: block;
+      width: 100%;
+      background-color: #36643b;
+      border: none;
+      padding: 14px;
+      font-size: 1.1rem;
+      color: white;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    button[type="submit"]:hover {
+      background-color: #3a8b44;
+    }
+    button[type="submit"]:focus {
+      outline: 3px solid #234327;
+      outline-offset: 2px;
+      background-color: #234327;
+    }
+    button[type="submit"]:not(:hover) {
+      background-color: #36643b;
+    }
+
+    textarea {
+      min-height: 80px;
+    }
+  </style>
+
   <script>
     function validarEEnviar(e) {
       e.preventDefault();
-
       const nome = document.getElementById("nome").value.trim();
       const telefone = document.getElementById("telefone").value.trim();
       const nascimento = document.getElementById("nascimento").value;
@@ -14,12 +177,9 @@
       const genero = document.querySelector('input[name="genero"]:checked').value;
       const genero_outro = document.getElementById("genero_outro").value.trim();
       const lote = document.getElementById("lote").value;
-
       const idade = new Date().getFullYear() - new Date(nascimento).getFullYear();
       if (idade < 18) return alert("⚠️ É necessário ter 18 anos ou mais.");
-
       if (ddd !== "47") alert("⚠️ Verifique se o DDD está correto. Deve ser 47.");
-
       const params = new URLSearchParams({
         nome,
         telefone,
@@ -33,9 +193,6 @@
         observacao: document.getElementById("observacao").value,
         lote
       });
-
-      // URL do seu Apps Script Web App
-
       const googleScriptURL = "https://script.google.com/macros/s/AKfycbxHhwbknea0nnHx8WtBrb6Sset8S6PYqh2QX6VpuCQkE1_b9utbVFhxf5PdXxr5_5uq4w/exec";
       window.location.href = `${googleScriptURL}?${params.toString()}`;
     }
@@ -48,62 +205,154 @@
   </script>
 </head>
 <body>
-  <h1>Formulário Ingresso</h1>
-  <form onsubmit="validarEEnviar(event)">
-    <label>Nome Completo: <input type="text" id="nome" required></label><br><br>
-    <label>Telefone/WhatsApp: <input type="text" id="telefone" required></label><br><br>
-    <label>Data de nascimento: <input type="date" id="nascimento" required></label><br><br>
-
-    <label>Quem te convidou?
-      <select id="convidado" required>
-        <option value="">--Selecione--</option>
-        <option value="Mikke">Mikke</option>
-        <option value="Rian">Rian</option>
-        <option value="Milly">Milly</option>
-      </select>
-    </label><br><br>
-
-    <label>Tamanho da camiseta:
-      <select id="camiseta" required>
-        <option value="">--Selecione--</option>
-        <option value="p">P</option>
-        <option value="m">M</option>
-        <option value="g">G</option>
-      </select>
-    </label><br><br>
-
-    <fieldset>
-      <legend>Gênero:</legend>
-      <label><input type="radio" name="genero" value="masculino" required onchange="toggleOutroGenero()"> Masculino</label>
-      <label><input type="radio" name="genero" value="feminino" onchange="toggleOutroGenero()"> Feminino</label>
-      <label><input type="radio" name="genero" value="outro" id="genero_outro_radio" onchange="toggleOutroGenero()"> Outro</label>
-    </fieldset>
-    <div id="genero_outro_container" style="display:none;">
-      <label>Especifique: <input type="text" id="genero_outro"></label>
-    </div><br>
-
-    <label>Opção do entrevero:
-      <select id="entrevero" required>
-        <option value="">--Selecione--</option>
-        <option value="Carne">Carne</option>
-        <option value="Vegano">Vegano</option>
-      </select>
-    </label><br><br>
-
-    <label>Forma de pagamento:
-      <select id="pagamento" required>
-        <option value="">--Selecione--</option>
-        <option value="PIX">PIX</option>
-        <option value="2x via PIX (entrada + 2° parcela até o dia 02/08)">2x via PIX</option>
-      </select>
-    </label><br><br>
-
-    <label>Observação: <textarea id="observacao" rows="3" cols="40"></textarea></label><br><br>
-
-    <!-- Lote oculto -->
-    <input type="hidden" id="lote" value="TOKEN_DO_LOTE_ATUAL">
-
-    <button type="submit">Enviar</button>
-  </form>
+  <div class="form-body-theme">
+    <div class="logo-evento">
+      <img class="logo-evento-img" src="https://i.ibb.co/t93WsRp/Logo-Verde-Sem-Borda.png" alt="Logo do Evento"/>
+    </div>
+    <div class="descricao-evento">
+      <div dir="auto">
+    <b
+      >Mais um ano, mais um Stamm com a&nbsp;<i>MELHOR&nbsp;</i>barraca do
+      evento 🙅‍♂️💚</b
+    >
+    <div>
+      <b><br /></b>
+    </div>
+    <div>
+      <b>OPEN BAR:<br /></b>Chope Pilsen e Chope Vinho<br />Vodka<br />Granadinha
+    </div>
+    <div>Tequila</div>
+    <div>Gin<br />Energético<br />Refrigerante<br />Água<br /><br /></div>
+    <div>
+      <b>OPEN FOOD:<br /></b>Entrevero (temos opção vegetariana)<br />Brigadeiro<br /><br />EVENTO
+      PARA MAIORES DE 18 ANOS<b></b>
+    </div>
+    <div>
+      <b><br /></b>
+    </div>
+    <div>
+      <b>💲&nbsp;</b><b>Ingresso:&nbsp;<u>110 R$</u>&nbsp;</b>
+    </div>
+    <div><br /></div>
+    <div>
+      💳 Para o ingresso a 110 R$, permitimos o pagamento&nbsp;<u
+        style="font-weight: bold"
+        >PARCELADO EM 2X NO PIX</u
+      ><span style="font-weight: bold">:</span>
+    </div>
+    <div>
+      <p><b>1ª parcela: a vista (para garantirmos sua vaga)</b></p>
+      <p><b>2ª parcela: até dia 02/08</b></p>
+      <p>
+        Caso o pagamento da&nbsp;<b>2ª parcela não seja realizado até 02/08</b>,
+        você irá&nbsp;<b
+          >perder a vaga sem direito a reembolso da 1ª parcela.</b
+        >
+      </p>
+      <div>
+        -&nbsp;Não será entregue&nbsp;<b>NADA</b>&nbsp;no dia do
+        evento.&nbsp;Entrega dos ingressos / kit somente pessoalmente na Furb na
+        semana (9 de agosto).&nbsp;
+      </div>
+      <div>
+        <div><br /></div>
+        <div>
+          <i
+            ><b>Chave PIX aleatória:</b
+            >&nbsp;&nbsp;26676cb8-e113-46e2-9172-c1b5404a4ae4</i
+          >
+        </div>
+        <div>
+          <i><br /></i>
+        </div>
+        <div>Mandar comprovante PIX para quem você solicitou.<br /></div>
+        <div>
+          Caso veio pelo&nbsp;<b>Instagram&nbsp;</b>mandar no chat do Instagram
+        </div>
+        <div><br /></div>
+        <div>Kamilly: 47991022089</div>
+        <div>Rian: 47996928462</div>
+        <div>
+          <i><br /></i>
+        </div>
+        <div>
+          <ul>
+            <li>
+              <b
+                >As vagas são&nbsp;<u>limitadas</u>, quem não enviar comprovante
+                em até 24 horas depois de preencher o forms terá o
+                registro&nbsp;<u>apagado</u>&nbsp;da planilha de vendas.<br /><br
+              /></b>
+            </li>
+            <li>
+              <b
+                >Em caso de perda da pulseira não será reembolsado e terá que
+                pagar novamente no lote atuar se houver vagas ainda.</b
+              >
+            </li>
+          </ul>
+          <b></b>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  
+    <form onsubmit="validarEEnviar(event)">
+      <label>Nome Completo: <input type="text" id="nome" required></label><br><br>
+      <label>Telefone/WhatsApp: <input type="text" id="telefone" required></label><br><br>
+      <label>Data de nascimento: <input type="date" id="nascimento" required></label><br><br>
+  
+      <label>Quem te convidou?
+        <select id="convidado" required>
+          <option value="">--Selecione--</option>
+          <option value="Mikke">Mikke</option>
+          <option value="Rian">Rian</option>
+          <option value="Milly">Milly</option>
+        </select>
+      </label><br><br>
+  
+      <label>Tamanho da camiseta:
+        <select id="camiseta" required>
+          <option value="">--Selecione--</option>
+          <option value="p">P</option>
+          <option value="m">M</option>
+          <option value="g">G</option>
+        </select>
+      </label><br><br>
+  
+      <fieldset>
+        <legend>Gênero:</legend>
+        <label><input type="radio" name="genero" value="masculino" required onchange="toggleOutroGenero()"> Masculino</label>
+        <label><input type="radio" name="genero" value="feminino" onchange="toggleOutroGenero()"> Feminino</label>
+        <label><input type="radio" name="genero" value="outro" id="genero_outro_radio" onchange="toggleOutroGenero()"> Outro</label>
+      </fieldset>
+      <div id="genero_outro_container" style="display:none;">
+        <label>Especifique: <input type="text" id="genero_outro"></label>
+      </div><br>
+  
+      <label>Opção do entrevero:
+        <select id="entrevero" required>
+          <option value="">--Selecione--</option>
+          <option value="Carne">Carne</option>
+          <option value="Vegano">Vegano</option>
+        </select>
+      </label><br><br>
+  
+      <label>Forma de pagamento:
+        <select id="pagamento" required>
+          <option value="">--Selecione--</option>
+          <option value="PIX">PIX</option>
+          <option value="2x via PIX (entrada + 2º parcela até o dia 02/08)">2x via PIX</option>
+        </select>
+      </label><br><br>
+  
+      <label>Observação: <textarea id="observacao" rows="3" cols="40"></textarea></label><br><br>
+  
+      <input type="hidden" id="lote" value="TOKEN_DO_LOTE_ATUAL">
+  
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
 </body>
 </html>
