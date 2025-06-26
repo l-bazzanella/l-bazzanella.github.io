@@ -316,8 +316,8 @@ button[type="submit"] {
     observacao: document.getElementById("observacao").value,
     lote
   });
-
-  const googleScriptURL = "https://script.google.com/macros/s/AKfycbxHhwbknea0nnHx8WtBrb6Sset8S6PYqh2QX6VpuCQkE1_b9utbVFhxf5PdXxr5_5uq4w/exec";
+                        //https://script.google.com/macros/s/AKfycbzYH6E7f-SVD4gpFVNgry0tjaiuuYkZR9fEMUJlSppQpFfPhy5ZSeTAjtB3dviJiSQWag/exec
+  const googleScriptURL = "https://script.google.com/macros/s/AKfycbzYH6E7f-SVD4gpFVNgry0tjaiuuYkZR9fEMUJlSppQpFfPhy5ZSeTAjtB3dviJiSQWag/exec";
 
   fetch(`${googleScriptURL}?${params.toString()}`)
     .then(response => response.json())
