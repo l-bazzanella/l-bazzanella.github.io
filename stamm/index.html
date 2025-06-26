@@ -47,7 +47,7 @@
       const token = await obterTokenDoLote();
       console.log(token);
       if (token) {
-        const url = `${linkBase}?usp=pp_url&${campoLoteID}=${encodeURIComponent(token)}`;
+        const url = `${linkBase}?${campoLoteID}=${encodeURIComponent(token)}`;
         document.getElementById("formulario").src = url;
       }
     }
