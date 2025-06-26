@@ -1,187 +1,108 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Formulário de Ingresso - Stamm 2025</title>
-  <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; }
-    label { display: block; margin-top: 1rem; }
-    input, select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.3rem; }
-    button { margin-top: 1.5rem; padding: 0.7rem 1.2rem; }
-    .hidden { display: none; }
-    .error { color: red; margin-top: 0.3rem; }
-  </style>
+  <meta charset="UTF-8" />
+  <title>Formulário Ingresso</title>
+  <script>
+    function validarEEnviar(e) {
+      e.preventDefault();
+
+      const nome = document.getElementById("nome").value.trim();
+      const telefone = document.getElementById("telefone").value.trim();
+      const nascimento = document.getElementById("nascimento").value;
+      const ddd = telefone.substring(0, 2);
+      const genero = document.querySelector('input[name="genero"]:checked').value;
+      const genero_outro = document.getElementById("genero_outro").value.trim();
+      const lote = document.getElementById("lote").value;
+
+      const idade = new Date().getFullYear() - new Date(nascimento).getFullYear();
+      if (idade < 18) return alert("⚠️ É necessário ter 18 anos ou mais.");
+
+      if (ddd !== "47") alert("⚠️ Verifique se o DDD está correto. Deve ser 47.");
+
+      const params = new URLSearchParams({
+        nome,
+        telefone,
+        nascimento,
+        convidado: document.getElementById("convidado").value,
+        camiseta: document.getElementById("camiseta").value,
+        genero,
+        genero_outro,
+        entrevero: document.getElementById("entrevero").value,
+        pagamento: document.getElementById("pagamento").value,
+        observacao: document.getElementById("observacao").value,
+        lote
+      });
+
+      // URL do seu Apps Script Web App
+      const googleScriptURL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
+      window.location.href = `${googleScriptURL}?${params.toString()}`;
+    }
+
+    function toggleOutroGenero() {
+      const outro = document.getElementById("genero_outro_container");
+      const isOutro = document.getElementById("genero_outro_radio").checked;
+      outro.style.display = isOutro ? "block" : "none";
+    }
+  </script>
 </head>
 <body>
-  <h2>Formulário de Ingresso - Stamm 2025</h2>
-
-  <form id="formulario">
-    <label>Nome Completo:
-      <input type="text" name="nome" required>
-    </label>
-
-    <label>Telefone / WhatsApp (com DDD):
-      <input type="tel" name="telefone" required placeholder="47 991234567" pattern="\d{2} \d{8,9}">
-      <div class="error" id="erro-ddd" style="display: none;">DDD diferente de 47. Verifique se digitou corretamente.</div>
-    </label>
-
-    <label>Data de nascimento:
-      <input type="date" name="nascimento" required>
-      <div class="error" id="erro-idade" style="display: none;">Você precisa ter mais de 18 anos.</div>
-    </label>
+  <h1>Formulário Ingresso</h1>
+  <form onsubmit="validarEEnviar(event)">
+    <label>Nome Completo: <input type="text" id="nome" required></label><br><br>
+    <label>Telefone/WhatsApp: <input type="text" id="telefone" required></label><br><br>
+    <label>Data de nascimento: <input type="date" id="nascimento" required></label><br><br>
 
     <label>Quem te convidou?
-      <select name="convidado" required>
-        <option value="">Selecione</option>
+      <select id="convidado" required>
+        <option value="">--Selecione--</option>
         <option value="Mikke">Mikke</option>
         <option value="Rian">Rian</option>
         <option value="Milly">Milly</option>
       </select>
-    </label>
+    </label><br><br>
 
     <label>Tamanho da camiseta:
-      <select name="camiseta" required>
-        <option value="">Selecione</option>
-        <option value="P">P</option>
-        <option value="M">M</option>
-        <option value="G">G</option>
+      <select id="camiseta" required>
+        <option value="">--Selecione--</option>
+        <option value="p">P</option>
+        <option value="m">M</option>
+        <option value="g">G</option>
       </select>
-    </label>
+    </label><br><br>
 
-    <label>Gênero:
-      <select name="genero" id="genero" required>
-        <option value="">Selecione</option>
-        <option value="Masculino">Masculino</option>
-        <option value="Feminino">Feminino</option>
-        <option value="Outro">Outro</option>
-      </select>
-    </label>
-
-    <label id="genero-outro-label" class="hidden">Descreva:
-      <input type="text" name="genero_outro">
-    </label>
+    <fieldset>
+      <legend>Gênero:</legend>
+      <label><input type="radio" name="genero" value="masculino" required onchange="toggleOutroGenero()"> Masculino</label>
+      <label><input type="radio" name="genero" value="feminino" onchange="toggleOutroGenero()"> Feminino</label>
+      <label><input type="radio" name="genero" value="outro" id="genero_outro_radio" onchange="toggleOutroGenero()"> Outro</label>
+    </fieldset>
+    <div id="genero_outro_container" style="display:none;">
+      <label>Especifique: <input type="text" id="genero_outro"></label>
+    </div><br>
 
     <label>Opção do entrevero:
-      <select name="entrevero" required>
-        <option value="">Selecione</option>
+      <select id="entrevero" required>
+        <option value="">--Selecione--</option>
         <option value="Carne">Carne</option>
         <option value="Vegano">Vegano</option>
       </select>
-    </label>
+    </label><br><br>
 
     <label>Forma de pagamento:
-      <select name="pagamento" required>
-        <option value="">Selecione</option>
+      <select id="pagamento" required>
+        <option value="">--Selecione--</option>
         <option value="PIX">PIX</option>
-        <option value="2x via PIX (entrada + 2ª até 02/08)">2x via PIX (entrada + 2ª até 02/08)</option>
+        <option value="2x via PIX (entrada + 2° parcela até o dia 02/08)">2x via PIX</option>
       </select>
-    </label>
+    </label><br><br>
 
-    <label>Observação:
-      <textarea name="observacao" rows="3"></textarea>
-    </label>
+    <label>Observação: <textarea id="observacao" rows="3" cols="40"></textarea></label><br><br>
 
-    <input type="hidden" name="lote" id="lote">
+    <!-- Lote oculto -->
+    <input type="hidden" id="lote" value="TOKEN_DO_LOTE_ATUAL">
 
     <button type="submit">Enviar</button>
   </form>
-
-  <script>
-    const form = document.getElementById("formulario");
-    const genero = document.getElementById("genero");
-    const generoOutroLabel = document.getElementById("genero-outro-label");
-    const erroDDD = document.getElementById("erro-ddd");
-    const erroIdade = document.getElementById("erro-idade");
-
-    genero.addEventListener("change", () => {
-      generoOutroLabel.classList.toggle("hidden", genero.value !== "Outro");
-    });
-
-    function validarIdade(dataNascimento) {
-      const hoje = new Date();
-      const nascimento = new Date(dataNascimento);
-      const idade = hoje.getFullYear() - nascimento.getFullYear();
-      const m = hoje.getMonth() - nascimento.getMonth();
-      return idade > 18 || (idade === 18 && m >= 0);
-    }
-
-    function validarDDD(telefone) {
-      return telefone.trim().startsWith("47");
-    }
-
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const dados = Object.fromEntries(new FormData(form).entries());
-
-      erroDDD.style.display = validarDDD(dados.telefone) ? "none" : "block";
-      erroIdade.style.display = validarIdade(dados.nascimento) ? "none" : "block";
-
-      if (!validarDDD(dados.telefone) || !validarIdade(dados.nascimento)) return;
-
-      if (dados.genero === "Outro") {
-        dados.genero = dados.genero_outro;
-      }
-      delete dados.genero_outro;
-
-      try {
-        const resposta = await fetch("https://aaasc.net.br/api/formExecution", {
-          method: "POST",
-          body: JSON.stringify(dados),
-          headers: { "Content-Type": "application/json" }
-        });
-
-        const resultado = await resposta.json();
-        if (resultado.status === "ok") {
-          alert("Formulário enviado com sucesso!");
-          form.reset();
-          generoOutroLabel.classList.add("hidden");
-        } else {
-          alert("Erro ao enviar o formulário.");
-        }
-      } catch (erro) {
-        alert("Erro de conexão ao enviar o formulário.");
-        console.error(erro);
-      }
-    });
-    
-    getToken();
-    // Preencher o lote automaticamente com um token fixo ou via fetch se quiser buscar online
-    async function getToken() {
-      document.getElementById("lote").value = await obterTokenDoLote();
-    }
-    
-    async function obterTokenDoLote() {
-      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHRMwVh-s3otYgaFoLhRzj7h3f-oyF8Dojf3fc6Pqlf1AX-fS3CqrNuspRRd5MQNb7x1DK6KfiO5pQ/pubhtml?gid=736107426&single=true";
-    
-      try {
-        const res = await fetch(url);
-        const html = await res.text();
-    
-        // Cria DOM virtual para processar o HTML remoto
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-    
-        // Acha a tabela principal publicada
-        const tabela = doc.querySelector("table.waffle");
-    
-        // Pega a segunda linha da tabela (linha 2 = índice 1)
-        const segundaLinha = tabela.querySelectorAll("tr")[2];
-        console.log(segundaLinha);
-        // Pega a primeira célula da segunda linha (coluna 1 = índice 0)
-        const celula = segundaLinha.querySelectorAll("td")[0];
-        console.log(celula);
-        // Extrai o conteúdo
-        const token = celula.textContent.trim().replace(/^"|"$/g, ''); // remove aspas
-    
-        console.log("Token do lote:", token);
-        return token;
-      } catch (e) {
-        console.error("Erro ao buscar token do lote:", e);
-        return null;
-      }
-    }
-    
-  </script>
 </body>
 </html>
