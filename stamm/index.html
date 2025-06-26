@@ -207,16 +207,25 @@ button[type="submit"] {
             <li>
               <b
                 >Em caso de perda da pulseira não será reembolsado e terá que
-                pagar novamente no lote atuar se houver vagas ainda.</b
+                pagar novamente no lote atual se ainda tiver vagas.</b
               >
             </li>
           </ul>
-          <b></b>Add commentMore actions
+          <b></b>
         </div>
       </div>
     </div>
   </div>
     </div>
+
+
+<div id="mensagem-sucesso" style="display: none; text-align: center; padding: 30px;">
+  <h2 style="color: green;">✅ Inscrição enviada com sucesso!</h2>
+  <p>Verifique com seu contato se o comprovante foi recebido. Você pode fechar essa página agora.</p>
+</div>
+
+
+
     <form onsubmit="validarEEnviar(event)">
       <label>Nome Completo:
         <input type="text" id="nome" required>
@@ -276,39 +285,54 @@ button[type="submit"] {
     </form>
   </div>
   <script>
-    function validarEEnviar(e) {
-      e.preventDefault();
-      const nome = document.getElementById("nome").value.trim();
-      const telefone = document.getElementById("telefone").value.trim();
-      const nascimento = document.getElementById("nascimento").value;
-      const ddd = telefone.substring(0, 2);
-      const genero = document.querySelector('input[name="genero"]:checked').value;
-      const genero_outro = document.getElementById("genero_outro").value.trim();
-      const lote = document.getElementById("lote").value;
-      const idade = new Date().getFullYear() - new Date(nascimento).getFullYear();
-      if (idade < 18) return alert("⚠️ É necessário ter 18 anos ou mais.");
-      if (ddd !== "47") alert("⚠️ Verifique se o DDD está correto. Deve ser 47.");
-      const params = new URLSearchParams({
-        nome,
-        telefone,
-        nascimento,
-        convidado: document.getElementById("convidado").value,
-        camiseta: document.getElementById("camiseta").value,
-        genero,
-        genero_outro,
-        entrevero: document.getElementById("entrevero").value,
-        pagamento: document.getElementById("pagamento").value,
-        observacao: document.getElementById("observacao").value,
-        lote
-      });
-      const googleScriptURL = "https://script.google.com/macros/s/AKfycbxHhwbknea0nnHx8WtBrb6Sset8S6PYqh2QX6VpuCQkE1_b9utbVFhxf5PdXxr5_5uq4w/exec";
-      window.location.href = `${googleScriptURL}?${params.toString()}`;
-    }function toggleOutroGenero() {
-  const outro = document.getElementById("genero_outro_container");
-  const isOutro = document.getElementById("genero_outro_radio").checked;
-  outro.style.display = isOutro ? "block" : "none";
-}
 
+
+
+    function validarEEnviar(e) {
+  e.preventDefault();
+
+  const nome = document.getElementById("nome").value.trim();
+  const telefone = document.getElementById("telefone").value.trim();
+  const nascimento = document.getElementById("nascimento").value;
+  const ddd = telefone.substring(0, 2);
+  const genero = document.querySelector('input[name="genero"]:checked').value;
+  const genero_outro = document.getElementById("genero_outro").value.trim();
+  const lote = document.getElementById("lote").value;
+
+  const idade = new Date().getFullYear() - new Date(nascimento).getFullYear();
+  if (idade < 18) return alert("⚠️ É necessário ter 18 anos ou mais.");
+  if (ddd !== "47") alert("⚠️ Verifique se o DDD está correto. Deve ser 47.");
+
+  const params = new URLSearchParams({
+    nome,
+    telefone,
+    nascimento,
+    convidado: document.getElementById("convidado").value,
+    camiseta: document.getElementById("camiseta").value,
+    genero,
+    genero_outro,
+    entrevero: document.getElementById("entrevero").value,
+    pagamento: document.getElementById("pagamento").value,
+    observacao: document.getElementById("observacao").value,
+    lote
+  });
+
+  const googleScriptURL = "https://script.google.com/macros/s/AKfycbxHhwbknea0nnHx8WtBrb6Sset8S6PYqh2QX6VpuCQkE1_b9utbVFhxf5PdXxr5_5uq4w/exec";
+
+  fetch(`${googleScriptURL}?${params.toString()}`)
+    .then(response => {
+      if (response.ok) {
+        document.querySelector("form").style.display = "none";
+        document.getElementById("mensagem-sucesso").style.display = "block";
+      } else {
+        alert("Erro ao enviar. Tente novamente mais tarde.");
+      }
+    })
+    .catch(error => {
+      console.error("Erro:", error);
+      alert("Erro ao enviar. Tente novamente.");
+    });
+}
   </script>
 </body>
 </html>
