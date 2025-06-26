@@ -11,7 +11,7 @@
     :root {
       --bg-url: url('https://i.ibb.co/4R3YDxxH/background.jpg');
     }
-    body {
+    /* body {
       background: var(--bg-url) no-repeat center center fixed !important;
       background-size: cover;
       font-family: 'Roboto', sans-serif;
@@ -21,8 +21,41 @@
       flex-direction: column;
       align-items: center;
       padding: 20px;
+    } */
+    body {
+      background: var(--bg-url) no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
     }
-
+    
+    @media (max-width: 768px) {
+      body {
+        background-size: contain;
+        background-attachment: scroll;
+        padding: 10px;
+      }
+    
+      .form-body-theme {
+        padding: 20px;
+        border-width: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+    
+      .logo-evento-img {
+        max-width: 90%;
+      }
+    
+      .descricao-evento {
+        font-size: 10pt;
+        padding: 15px;
+      }
+    }
     .logo-evento {
       margin-top: 30px;
       margin-bottom: 50px;
