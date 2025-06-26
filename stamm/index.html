@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="pt-BR">
+
+  <!DOCTYPE html><html lang="pt-BR">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Formulário Ingresso</title>
@@ -171,7 +172,7 @@ button[type="submit"] {
     </div>
     <div><br /></div>
     <div>
-      💳 Para o ingresso a 110 R$, permitimos o pagamento&nbsp;<u
+      💳 Para o não promocional permitimos o pagamento&nbsp;<u
         style="font-weight: bold"
         >PARCELADO EM 2X NO PIX</u
       ><span style="font-weight: bold">:</span>
@@ -233,7 +234,10 @@ button[type="submit"] {
     </div>
   </div>
     </div>
-
+  <div class="descricao-evento">
+      Lote: <b>Promocional</b></br>
+      Valor: <b>R$ 100</b>
+  </div>
 
 <div id="mensagem-sucesso" style="display: none; text-align: center; padding: 30px;">
   <h2 style="color: green;">✅ Inscrição enviada com sucesso!</h2>
@@ -326,55 +330,135 @@ button[type="submit"] {
     </div>
   <script>
 
-function validarEEnviar(e) {
-  e.preventDefault();
-  const botao = document.querySelector('button[type="submit"]');
-  botao.disabled = true;
-  botao.innerText = 'Enviando...';
-  
-  const nome = document.getElementById("nome").value.trim();
-  const telefone = document.getElementById("telefone").value.trim();
-  const nascimento = document.getElementById("nascimento").value;
-  const ddd = telefone.substring(0, 2);
-  const genero = document.querySelector('input[name="genero"]:checked').value;
-  const genero_outro = document.getElementById("genero_outro").value.trim();
-  const lote = document.getElementById("lote").value;
 
-  const idade = new Date().getFullYear() - new Date(nascimento).getFullYear();
-  if (idade < 18) return alert("⚠️ É necessário ter 18 anos ou mais.");
-  if (ddd !== "47") alert("⚠️ Verifique se o DDD está correto. Deve ser 47.");
+    window.addEventListener('DOMContentLoaded', async () => {
+        const infoLote = await fetch("https://script.google.com/macros/s/AKfycbzdrxuGOGomrowMgRH29Xr7_UcJQIkwLS0qGI4RBx99SRvvz2kNWoMTl6iiU29vaauLtQ/exec")
+            .then(r => r.json())
+            .catch(() => ({ token: null, isPromo: null }));
 
-  const params = new URLSearchParams({
-    nome,
-    telefone,
-    nascimento,
-    convidado: document.getElementById("convidado").value,
-    camiseta: document.getElementById("camiseta").value,
-    genero,
-    genero_outro,
-    entrevero: document.getElementById("entrevero").value,
-    pagamento: document.getElementById("pagamento").value,
-    observacao: document.getElementById("observacao").value,
-    lote
-  });
+        document.getElementById("lote").value = infoLote.token;
+
+        if (infoLote.isPromo) {
+            const pagamento = document.getElementById('pagamento');
+            pagamento.value = "PIX";
+            pagamento.disabled = true;
+        }
+
+    });
+    
+    
+    const promo = false;
+    
+    function validarEEnviar(e) {
+    e.preventDefault();
+    const botao = document.querySelector('button[type="submit"]');
+    botao.disabled = true;
+    botao.innerText = 'Enviando...';
+    
+    const nome = document.getElementById("nome").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+    const nascimento = document.getElementById("nascimento").value;
+    const ddd = telefone.substring(0, 2);
+    const genero = document.querySelector('input[name="genero"]:checked').value;
+    const genero_outro = document.getElementById("genero_outro").value.trim();
+    const lote = document.getElementById("lote").value;
+
+    const idade = new Date().getFullYear() - new Date(nascimento).getFullYear();
+    if (idade < 18) return alert("⚠️ É necessário ter 18 anos ou mais.");
+    if (ddd !== "47") alert("⚠️ Verifique se o DDD está correto. Deve ser 47.");
+
+    const params = new URLSearchParams({
+        nome,
+        telefone,
+        nascimento,
+        convidado: document.getElementById("convidado").value,
+        camiseta: document.getElementById("camiseta").value,
+        genero,
+        genero_outro,
+        entrevero: document.getElementById("entrevero").value,
+        pagamento: document.getElementById("pagamento").value,
+        observacao: document.getElementById("observacao").value,
+        lote
+    });
                         //https://script.google.com/macros/s/AKfycbzYH6E7f-SVD4gpFVNgry0tjaiuuYkZR9fEMUJlSppQpFfPhy5ZSeTAjtB3dviJiSQWag/exec
   const googleScriptURL = "https://script.google.com/macros/s/AKfycbzYH6E7f-SVD4gpFVNgry0tjaiuuYkZR9fEMUJlSppQpFfPhy5ZSeTAjtB3dviJiSQWag/exec";
 
-  fetch(`${googleScriptURL}?${params.toString()}`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === "ok") {
-        document.querySelector("form").style.display = "none";
-        document.getElementById("mensagem-sucesso").style.display = "block";
-      } else {
-        alert("Erro inesperado ao enviar.");
+    fetch(`${googleScriptURL}?${params.toString()}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "ok") {
+            document.querySelector("form").style.display = "none";
+            document.getElementById("mensagem-sucesso").style.display = "block";
+            } else {
+            alert("Erro inesperado ao enviar.");
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            alert("Erro ao enviar. Tente novamente.");
+        });
+    }
+    
+    async function obterTokenDoLote() {
+      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHRMwVh-s3otYgaFoLhRzj7h3f-oyF8Dojf3fc6Pqlf1AX-fS3CqrNuspRRd5MQNb7x1DK6KfiO5pQ/pubhtml?gid=736107426&single=true";
+    
+      try {
+        const res = await fetch(url);
+        const html = await res.text();
+    
+        // Cria DOM virtual para processar o HTML remoto
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+    
+        // Acha a tabela principal publicada
+        const tabela = doc.querySelector("table.waffle");
+    
+        // Pega a segunda linha da tabela (linha 2 = índice 1)
+        const segundaLinha = tabela.querySelectorAll("tr")[2];
+
+        // Pega a primeira célula da segunda linha (coluna 1 = índice 0)
+        const celula = segundaLinha.querySelectorAll("td")[0];
+    
+        // Extrai o conteúdo
+        const token = celula.textContent.trim().replace(/^"|"$/g, ''); // remove aspas
+
+        return token;
+      } catch (e) {
+        console.error("Erro ao buscar token do lote:", e);
+        return null;
       }
-    })
-    .catch(error => {
-      console.error("Erro:", error);
-      alert("Erro ao enviar. Tente novamente.");
-    });
-}
+    }
+    
+    async function isPromo() {
+      const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHRMwVh-s3otYgaFoLhRzj7h3f-oyF8Dojf3fc6Pqlf1AX-fS3CqrNuspRRd5MQNb7x1DK6KfiO5pQ/pubhtml?gid=736107426&single=true";
+    
+      try {
+        const res = await fetch(url);
+        const html = await res.text();
+    
+        // Cria DOM virtual para processar o HTML remoto
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+    
+        // Acha a tabela principal publicada
+        const tabela = doc.querySelector("table.waffle");
+    
+        // Pega a segunda linha da tabela (linha 2 = índice 1)
+        const segundaLinha = tabela.querySelectorAll("tr")[3];
+    
+        // Pega a primeira célula da segunda linha (coluna 1 = índice 0)
+        const celula = segundaLinha.querySelectorAll("td")[0];
+
+        // Extrai o conteúdo
+        const isPromo = celula.textContent.trim().replace(/^"|"$/g, ''); // remove aspas
+
+        return isPromo === "TRUE" ? true : false;
+      } catch (e) {
+        console.error("Erro ao buscar status do lote:", e);
+        return null;
+      }
+    }
   </script>
 </body>
 </html>
+
