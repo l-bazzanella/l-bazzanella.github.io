@@ -48,6 +48,7 @@
       console.log(token);
       if (token) {
         const url = `${linkBase}?${campoLoteID}=${encodeURIComponent(token)}`;
+        console.log(url);
         document.getElementById("formulario").src = url;
       }
     }
