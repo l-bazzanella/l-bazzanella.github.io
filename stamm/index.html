@@ -1,220 +1,198 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Formulário Ingresso</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-    :root {
-      --bg-url: url('https://i.ibb.co/4R3YDxxH/background.jpg');
-    }
+    * {
+      box-sizing: border-box;
+    }:root {
+  --bg-url: url('https://i.ibb.co/4R3YDxxH/background.jpg');
+}
 
-    body {
-      background: var(--bg-url) no-repeat center center fixed;
-      background-size: cover;
-      font-family: 'Roboto', sans-serif;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
 
-    @media (max-width: 768px) {
-      body {
-        background-size: cover;
-        background-position: center center;
-      }
+body {
+  background: var(--bg-url) no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
 
-      .form-body-theme {
-        padding: 15px;
-        margin-top: 10px;
-        border-width: 4px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
+.form-body-theme {
+  width: 100%;
+  max-width: 580px;
+  background-color: #ede6d8;
+  border: 7px solid #d2a76e;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0,0,0);
+  padding: 30px 40px;
+  margin-top: 20px;
+}
 
-      .logo-evento-img {
-        max-width: 90%;
-      }
+.logo-evento {
+  text-align: center;
+  margin-bottom: 30px;
+}
 
-      .descricao-evento {
-        font-size: 0.95rem;
-        padding: 12px;
-      }
+.logo-evento-img {
+  max-width: 100%;
+  height: auto;
+}
 
-      form {
-        font-size: 1rem;
-      }
+.descricao-evento {
+  color: #234327;
+  background-color: rgba(210, 167, 110, 0.49);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  text-align: justify;
+}
 
-      label, legend, fieldset label {
-        font-size: 1rem;
-      }
+form {
+  width: 100%;
+}
 
-      button[type="submit"] {
-        font-size: 1rem;
-        padding: 12px;
-      }
+label,
+legend {
+  display: block;
+  font-weight: bold;
+  color: #36643b;
+  margin-top: 16px;
+}
 
-      textarea {
-        font-size: 1rem;
-      }
-    }
+input[type="text"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  margin-top: 6px;
+  font-family: 'Roboto', sans-serif;
+}
 
-    input,
-    select,
-    textarea,
-    button {
-      font-size: 1rem;
-    }
+fieldset {
+  border: none;
+  padding: 0;
+  margin-top: 20px;
+}
 
-    .logo-evento {
-      margin-top: 30px;
-      margin-bottom: 50px;
-      width: 100%;
-      display: grid;
-      justify-content: center;
-    }
+fieldset label {
+  margin-right: 12px;
+  font-weight: 400;
+  color: #444;
+}
 
-    .logo-evento-img {
-      max-width: 380px;
-    }
+button[type="submit"] {
+  margin-top: 20px;
+  width: 100%;
+  background-color: #36643b;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    .descricao-evento {
-      color: #234327;
-      background-color: rgb(210 167 110 / 49%);
-      padding: 20px;
-      max-width: 600px;
-      border-radius: 10px;
-      margin: 20px 0;
-      text-align: center;
-      font-family: 'Roboto';
-      font-weight: 400;
-      font-size: 11pt;
-      line-height: 1.5;
-      letter-spacing: 0;
-      text-align: justify;
-    }
+@media (max-width: 768px) {
+  .form-body-theme {
+    padding: 20px;
+  }
 
-    form {
-      background: rgba(0,0,0,0);
-      width: 100%;
-    }
+  input[type="text"],
+  input[type="date"],
+  select,
+  textarea,
+  button[type="submit"] {
+    font-size: 18px;
+  }
+}
 
-    .form-body-theme {
-      width: 100%;
-      padding: 30px 40px;
-      border-radius: 8px;
-      max-width: 580px;
-      margin-top: -30px;
-      background-color: #ede6d8;
-      border: 7px solid #d2a76e;
-      box-shadow: 0 8px 16px rgba(0,0,0);
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #222;
-      font-weight: 700;
-      font-size: 1.8rem;
-      user-select: none;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 14px;
-      font-weight: 700;
-      color: #36643b;
-    }
-
-    input[type="text"],
-    input[type="date"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 0.75rem;
-      margin-top: 0.5rem;
-      border: 1.8px solid #ccc;
-      border-radius: 5px;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-      font-family: 'Roboto', sans-serif;
-      resize: vertical;
-    }
-
-    input[type="text"]:focus,
-    input[type="date"]:focus,
-    select:focus,
-    textarea:focus {
-      border-color: #0b74de;
-      outline: none;
-      box-shadow: 0 0 5px #0b74deaa;
-    }
-
-    input:invalid, select:invalid, textarea:invalid {
-      border-color: #e03e3e;
-    }
-
-    fieldset {
-      border: none;
-      margin-bottom: 20px;
-      padding: 0;
-    }
-
-    legend {
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #444;
-    }
-
-    fieldset label {
-      display: inline-block;
-      margin-right: 18px;
-      font-weight: 400;
-      cursor: pointer;
-      color: #444;
-      user-select: none;
-    }
-
-    #genero_outro_container {
-      margin-top: 10px;
-    }
-
-    button[type="submit"] {
-      display: block;
-      width: 100%;
-      background-color: #36643b;
-      border: none;
-      padding: 14px;
-      font-size: 1.1rem;
-      color: white;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-
-    button[type="submit"]:hover {
-      background-color: #3a8b44;
-    }
-
-    button[type="submit"]:focus {
-      outline: 3px solid #234327;
-      outline-offset: 2px;
-      background-color: #234327;
-    }
-
-    button[type="submit"]:not(:hover) {
-      background-color: #36643b;
-    }
-
-    textarea {
-      min-height: 80px;
-    }
   </style>
+</head>
+<body>
+  <div class="form-body-theme">
+    <div class="logo-evento">
+      <img class="logo-evento-img" src="https://i.ibb.co/t93WsRp/Logo-Verde-Sem-Borda.png" alt="Logo do Evento">
+    </div>
+    <div class="descricao-evento">
+      <p>Mais um ano, mais um Stamm com a <strong>MELHOR</strong> barraca do evento 🙅‍♂️💚</p>
+      <p><strong>OPEN BAR:</strong> Chope Pilsen, Chope Vinho, Vodka, Granadinha, Tequila, Gin, Energético, Refrigerante, Água</p>
+      <p><strong>OPEN FOOD:</strong> Entrevero (temos opção vegetariana), Brigadeiro</p>
+      <p><strong>Evento para maiores de 18 anos</strong></p>
+    </div>
+    <form onsubmit="validarEEnviar(event)">
+      <label>Nome Completo:
+        <input type="text" id="nome" required>
+      </label>
+      <label>Telefone/WhatsApp:
+        <input type="text" id="telefone" required>
+      </label>
+      <label>Data de nascimento:
+        <input type="date" id="nascimento" required>
+      </label>
+      <label>Quem te convidou?
+        <select id="convidado" required>
+          <option value="">--Selecione--</option>
+          <option value="Mikke">Mikke</option>
+          <option value="Rian">Rian</option>
+          <option value="Milly">Milly</option>
+        </select>
+      </label>
+      <label>Tamanho da camiseta:
+        <select id="camiseta" required>
+          <option value="">--Selecione--</option>
+          <option value="p">P</option>
+          <option value="m">M</option>
+          <option value="g">G</option>
+        </select>
+      </label>
+      <fieldset>
+        <legend>Gênero:</legend>
+        <label><input type="radio" name="genero" value="masculino" required onchange="toggleOutroGenero()"> Masculino</label>
+        <label><input type="radio" name="genero" value="feminino" onchange="toggleOutroGenero()"> Feminino</label>
+        <label><input type="radio" name="genero" value="outro" id="genero_outro_radio" onchange="toggleOutroGenero()"> Outro</label>
+      </fieldset>
+      <div id="genero_outro_container" style="display:none;">
+        <label>Especifique:
+          <input type="text" id="genero_outro">
+        </label>
+      </div>
+      <label>Opção do entrevero:
+        <select id="entrevero" required>
+          <option value="">--Selecione--</option>
+          <option value="Carne">Carne</option>
+          <option value="Vegano">Vegano</option>
+        </select>
+      </label>
+      <label>Forma de pagamento:
+        <select id="pagamento" required>
+          <option value="">--Selecione--</option>
+          <option value="PIX">PIX</option>
+          <option value="2x via PIX (entrada + 2º parcela até o dia 02/08)">2x via PIX</option>
+        </select>
+      </label>
+      <label>Observação:
+        <textarea id="observacao" rows="3" cols="40"></textarea>
+      </label>
+      <input type="hidden" id="lote" value="TOKEN_DO_LOTE_ATUAL">
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
   <script>
     function validarEEnviar(e) {
       e.preventDefault();
@@ -243,14 +221,12 @@
       });
       const googleScriptURL = "https://script.google.com/macros/s/AKfycbxHhwbknea0nnHx8WtBrb6Sset8S6PYqh2QX6VpuCQkE1_b9utbVFhxf5PdXxr5_5uq4w/exec";
       window.location.href = `${googleScriptURL}?${params.toString()}`;
-    }
+    }function toggleOutroGenero() {
+  const outro = document.getElementById("genero_outro_container");
+  const isOutro = document.getElementById("genero_outro_radio").checked;
+  outro.style.display = isOutro ? "block" : "none";
+}
 
-    function toggleOutroGenero() {
-      const outro = document.getElementById("genero_outro_container");
-      const isOutro = document.getElementById("genero_outro_radio").checked;
-      outro.style.display = isOutro ? "block" : "none";
-    }
   </script>
-</head>
-<body>
-<!-- conteúdo continua como está -->
+</body>
+</html>
