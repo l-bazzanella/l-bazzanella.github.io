@@ -236,7 +236,7 @@ button[type="submit"] {
     </div>
   <div class="descricao-evento">
       Lote: <b><span id="promo-name"> </span></b></br>
-      Promcional: <b><span id="is-promo"> </span></b></br>
+      Promocional: <b><span id="is-promo"> </span></b></br>
       Valor: <b>R$ <span id="preco"> </span></b>
   </div>
 
@@ -359,6 +359,8 @@ button[type="submit"] {
             document.getElementById("forma-pagamento").innerText = "Forma de pagamento (ingresso promocional, pagamento apenas a vista no pix):";
             pagamento.value = "PIX";
             pagamento.disabled = true;
+        } else {
+          document.getElementById("is-promo").innerText = "Não";
         }
 
     });
