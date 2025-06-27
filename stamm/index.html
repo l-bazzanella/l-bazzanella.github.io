@@ -174,6 +174,9 @@ button[type="submit"] {
         >PARCELADO EM 2X NO PIX</u
       ><span style="font-weight: bold">:</span>
     </div>
+          <div style="text-align: center"></br>
+            <b><span style="font-size: 20px; background-color: red; color: white;"> APENAS PARA INGRESSO NÃO PROMOCIONAL</span></b>
+        </div>
     <div>
       <p><b>1ª parcela: a vista (para garantirmos sua vaga)</b></p>
       <p><b>2ª parcela: até dia 02/08</b></p>
@@ -233,6 +236,7 @@ button[type="submit"] {
     </div>
   <div class="descricao-evento">
       Lote: <b><span id="promo-name"> </span></b></br>
+      Promcional: <b><span id="is-promo"> </span></b></br>
       Valor: <b>R$ <span id="preco"> </span></b>
   </div>
 
@@ -287,7 +291,7 @@ button[type="submit"] {
         </div>
       </label>
       <fieldset>
-        <legend>Gênero:</legend>
+        <legend>Seu gênero:</legend>
         <label><input type="radio" name="genero" value="masculino" required onchange="toggleOutroGenero()"> Masculino</label>
         <label><input type="radio" name="genero" value="feminino" onchange="toggleOutroGenero()"> Feminino</label>
         <label><input type="radio" name="genero" value="outro" id="genero_outro_radio" onchange="toggleOutroGenero()"> Outro</label>
@@ -304,7 +308,7 @@ button[type="submit"] {
           <option value="Vegano">Vegano</option>
         </select>
       </label>
-      <label>Forma de pagamento:
+      <label id="forma-pagamento">Forma de pagamento:
         <select id="pagamento" required>
           <option value="">--Selecione--</option>
           <option value="PIX">PIX</option>
@@ -316,6 +320,18 @@ button[type="submit"] {
       <label>Observação:
         <textarea id="observacao" rows="3" cols="40"></textarea>
       </label>
+      <div class="descricao-evento" style="margin-top: 30px;">
+        <h3 style="margin-bottom: 10px;">🧾 Resumo do seu pedido</h3>
+        Nome: <b><span id="resumo-nome"></span></b><br>
+        Telefone: <b><span id="resumo-telefone"></span></b><br>
+        Nascimento: <b><span id="resumo-nascimento"></span></b><br>
+        Convidado: <b><span id="resumo-convidado"></span></b><br>
+        Camiseta: <b><span id="resumo-camiseta"></span></b><br>
+        Gênero: <b><span id="resumo-genero"></span></b><br>
+        Entrevero: <b><span id="resumo-entrevero"></span></b><br>
+        Pagamento: <b><span id="resumo-pagamento"></span></b><br>
+        Observação: <b><span id="resumo-observacao"></span></b>
+      </div>
       <input type="hidden" id="lote" value="TOKEN_DO_LOTE_ATUAL">
       <button type="submit">Enviar</button>
     </form>
@@ -330,18 +346,57 @@ button[type="submit"] {
     window.addEventListener('DOMContentLoaded', async () => {
         const infoLote = await fetch("https://script.google.com/macros/s/AKfycbxTRxMi9Ta6xlKp3IsDMxqQBG0zC9uFxjUW1oMBHGdQ2W1bS7XpuLK9lRg1Qyl-Qlr_hQ/exec")
             .then(r => r.json())
-            .catch(() => ({ token: null, isPromo: null, price:null }));
+            .catch(() => ({ promoName: null, token: null, isPromo: null, price:null }));
 
         document.getElementById("lote").value = infoLote.token;
         document.getElementById("preco").innerText = infoLote.price;
         document.getElementById("promo-name").innerText = infoLote.promoName;
-
+        
+      
         if (infoLote.isPromo) {
             const pagamento = document.getElementById('pagamento');
+            document.getElementById("is-promo").innerText = "SIM - Pagamento a vista.";
+            document.getElementById("forma-pagamento").innerText = "Forma de pagamento (ingresso promocional, pagamento apenas a vista no pix):";
             pagamento.value = "PIX";
             pagamento.disabled = true;
         }
 
+    });
+
+    function atualizarResumo() {
+      document.getElementById("resumo-nome").innerText = document.getElementById("nome").value.trim();
+      document.getElementById("resumo-telefone").innerText = document.getElementById("telefone").value.trim();
+      document.getElementById("resumo-nascimento").innerText = document.getElementById("nascimento").value;
+      document.getElementById("resumo-convidado").innerText = document.getElementById("convidado").value;
+      document.getElementById("resumo-camiseta").innerText = document.getElementById("camiseta").value;
+      const generoSelecionado = document.querySelector('input[name="genero"]:checked');
+      if (generoSelecionado) {
+        document.getElementById("resumo-genero").innerText =
+          generoSelecionado.value === "outro"
+            ? document.getElementById("genero_outro").value.trim()
+            : generoSelecionado.value;
+      }
+      document.getElementById("resumo-entrevero").innerText = document.getElementById("entrevero").value;
+      document.getElementById("resumo-pagamento").innerText = document.getElementById("pagamento").value;
+      document.getElementById("resumo-observacao").innerText = document.getElementById("observacao").value.trim();
+    }
+    
+    // Escuta todos os campos para atualizar o resumo ao mudar
+    const camposResumo = [
+      "nome", "telefone", "nascimento", "convidado", "camiseta", "genero_outro",
+      "entrevero", "pagamento", "observacao"
+    ];
+    
+    camposResumo.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener("input", atualizarResumo);
+        el.addEventListener("change", atualizarResumo);
+      }
+    });
+    
+    document.querySelectorAll('input[name="genero"]').forEach(input => {
+      input.addEventListener("change", atualizarResumo);
     });
     
     function toggleOutroGenero() {
