@@ -139,9 +139,27 @@ button[type="submit"] {
   color: #ffefdb;
   font-weight: 500;
 }
+
+.loading-overlay {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #36643b;
+}
   </style>
 </head>
 <body>
+  <div id="loading-overlay" class="loading-overlay">
+    Carregando...
+  </div>
   <div class="form-body-theme">
     <div class="logo-evento">
       <img class="logo-evento-img" src="https://i.ibb.co/t93WsRp/Logo-Verde-Sem-Borda.png" alt="Logo do Evento">
@@ -240,10 +258,10 @@ button[type="submit"] {
       Valor: <b>R$ <span id="preco"> </span></b>
   </div>
 
-<div id="mensagem-sucesso" style="display: none; text-align: center; padding: 30px;">
-  <h2 style="color: green;">✅ Inscrição enviada com sucesso!</h2>
-  <p>Você pode fechar ou atualizar esta pagina para uma nova compra.</p>
-</div>
+  <div id="mensagem-sucesso" style="display: none; text-align: center; padding: 30px;">
+    <h2 style="color: green;">✅ Inscrição enviada com sucesso!</h2>
+    <p>Você pode fechar ou atualizar esta pagina para uma nova compra.</p>
+  </div>
 
 
 
@@ -260,18 +278,18 @@ button[type="submit"] {
       <label>Quem te convidou?
         <select id="convidado" required>
           <option value="">--Selecione--</option>
-          <option value="Instagram">Instagram</option>
-          <option value="Luigi">Luigi</option>
-          <option value="Lorenzzo">Lorenzzo</option>
-          <option value="Skyrim">Skyrim</option>
-          <option value="Mikke">Mikke</option>
-          <option value="Alani">Alani</option>
-          <option value="Erick">Erick</option>
-          <option value="Kamilly">Kamilly</option>
-          <option value="Brenda">Brenda</option>
-          <option value="Tormena">Tormena</option>
-          <option value="Rian">Rian</option>
-          <option value="Kauana">Kauana</option>
+          <option value="instagram">Instagram</option>
+          <option value="luigi">Luigi</option>
+          <option value="lorenzzo">Lorenzzo</option>
+          <option value="skyrim">Skyrim</option>
+          <option value="mikke">Mikke</option>
+          <option value="alani">Alani</option>
+          <option value="erick">Erick</option>
+          <option value="kamilly">Kamilly</option>
+          <option value="brenda">Brenda</option>
+          <option value="tormena">Tormena</option>
+          <option value="rian">Rian</option>
+          <option value="kauana">Kauana</option>
         </select>
       </label>
       <label>
@@ -344,26 +362,50 @@ button[type="submit"] {
   <script>
     
     window.addEventListener('DOMContentLoaded', async () => {
-        const infoLote = await fetch("https://script.google.com/macros/s/AKfycbxTRxMi9Ta6xlKp3IsDMxqQBG0zC9uFxjUW1oMBHGdQ2W1bS7XpuLK9lRg1Qyl-Qlr_hQ/exec")
+      setFormDisabled(true); // Bloqueia o formulário
+      document.getElementById('loading-overlay').style.display = 'flex';
+  
+      const infoLote = await fetch("https://script.google.com/macros/s/AKfycbxTRxMi9Ta6xlKp3IsDMxqQBG0zC9uFxjUW1oMBHGdQ2W1bS7XpuLK9lRg1Qyl-Qlr_hQ/exec")
             .then(r => r.json())
             .catch(() => ({ promoName: null, token: null, isPromo: null, price:null }));
 
         document.getElementById("lote").value = infoLote.token;
         document.getElementById("preco").innerText = infoLote.price;
         document.getElementById("promo-name").innerText = infoLote.promoName;
-        
       
         if (infoLote.isPromo) {
             const pagamento = document.getElementById('pagamento');
             document.getElementById("is-promo").innerText = "SIM - Pagamento a vista.";
             document.getElementById("forma-pagamento").innerText = "Forma de pagamento (ingresso promocional, pagamento apenas a vista no pix):";
             pagamento.value = "PIX";
-            pagamento.disabled = true;
         } else {
           document.getElementById("is-promo").innerText = "Não";
         }
 
+        const params = new URLSearchParams(window.location.search);
+        const reference = params.get('reference');
+        const selectConvidado = document.getElementById('convidado');
+
+        if (reference) {
+            selectConvidado.value = reference.toLowerCase();
+            selectConvidado.disabled = true;
+            // Dispara evento para atualizar o resumo
+            selectConvidado.dispatchEvent(new Event('change'));
+        }
+
+        setFormDisabled(false); // Desbloqueia o formulário
+        pagamento.disabled = infoLote.isPromo;
+        selectConvidado.disabled = !!reference;
+        document.getElementById('loading-overlay').style.display = 'none';
     });
+
+    function setFormDisabled(disabled) {
+      document.querySelectorAll(
+        'input, select, textarea, button[type="submit"]'
+      ).forEach(el => {
+        el.disabled = disabled;
+      });
+    }
 
     function atualizarResumo() {
       document.getElementById("resumo-nome").innerText = document.getElementById("nome").value.trim();
@@ -444,7 +486,7 @@ button[type="submit"] {
         lote
     });
                         //https://script.google.com/macros/s/AKfycbx--6VVYoPeiMdk5lFdpqYbfLGdlGrvYkydnpzrOPVd7NUErDM-jW3SqgNrnNBYn9AeKQ/exec
-  const googleScriptURL = "https://script.google.com/macros/s/AKfycbx7oIRo2o6-2-SfAuKvH7gq2SPFJdZ5z83-tBp5yMgqW7CYtBhP_3qf_R10B8fPwpwPcQ/exec";
+    const googleScriptURL = "https://script.google.com/macros/s/AKfycbx7oIRo2o6-2-SfAuKvH7gq2SPFJdZ5z83-tBp5yMgqW7CYtBhP_3qf_R10B8fPwpwPcQ/exec";
 
     fetch(`${googleScriptURL}?${params.toString()}`)
         .then(response => response.json())
