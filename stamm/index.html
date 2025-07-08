@@ -210,12 +210,15 @@ button[type="submit"] {
         semana (9 de agosto).&nbsp;
       </div>
       <div>
-        <div><br /></div>
         <div>
-          <i
-            ><b>Chave PIX aleatória:</b
-            >&nbsp;&nbsp;26676cb8-e113-46e2-9172-c1b5404a4ae4</i
-          >
+          <br/>
+        </div>
+        <div style="text-align: center">
+          <i>
+            <b>Chave PIX aleatória:</b><br/><br/>
+            <span id="pix-chave" style="cursor:pointer; text-decoration:underline; font-size: 20px; background-color:#36643b; color: white; padding: 5px;" title="Clique para copiar">26676cb8-e113-46e2-9172-c1b5404a4ae4</span>
+            <br/><br/><span style="font-size:0.9em; color:#2d472f;">Clique na chave para copiar 📋</span>
+          </i>
         </div>
         <div>
           <i><br /></i>
@@ -360,7 +363,24 @@ button[type="submit"] {
       </div>
     </div>
   <script>
-    
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const pixChave = document.getElementById('pix-chave');
+      const pixIcon = document.getElementById('pix-copy-icon');
+      const pixMsg = pixChave.innerText;
+      function copiarPix() {
+        const chave = pixChave.innerText.trim();
+        navigator.clipboard.writeText(chave).then(() => {
+          pixChave.innerText = 'Copiado!';
+          setTimeout(() => {
+            pixChave.innerText = pixMsg; // Restaura o texto original
+          }, 2500);
+        });
+      }
+      if (pixChave) pixChave.addEventListener('click', copiarPix);
+      if (pixIcon) pixIcon.addEventListener('click', copiarPix);
+    });
+
     window.addEventListener('DOMContentLoaded', async () => {
       setFormDisabled(true); // Bloqueia o formulário
       document.getElementById('loading-overlay').style.display = 'flex';
@@ -385,17 +405,24 @@ button[type="submit"] {
         const params = new URLSearchParams(window.location.search);
         const reference = params.get('reference');
         const selectConvidado = document.getElementById('convidado');
+        let bloqueiaConvidado = false;
 
         if (reference) {
-            selectConvidado.value = reference.toLowerCase();
-            selectConvidado.disabled = true;
-            // Dispara evento para atualizar o resumo
-            selectConvidado.dispatchEvent(new Event('change'));
+          // Procura se existe uma opção com o valor igual ao reference (case insensitive)
+          const option = Array.from(selectConvidado.options).find(
+              opt => opt.value.toLowerCase() === reference.toLowerCase()
+          );
+          if (option) {
+              selectConvidado.value = option.value;
+              bloqueiaConvidado = true;
+              // Dispara evento para atualizar o resumo
+              selectConvidado.dispatchEvent(new Event('change'));
+          }
         }
 
         setFormDisabled(false); // Desbloqueia o formulário
         pagamento.disabled = infoLote.isPromo;
-        selectConvidado.disabled = !!reference;
+        selectConvidado.disabled = bloqueiaConvidado;
         document.getElementById('loading-overlay').style.display = 'none';
     });
 
@@ -411,7 +438,7 @@ button[type="submit"] {
       document.getElementById("resumo-nome").innerText = document.getElementById("nome").value.trim();
       document.getElementById("resumo-telefone").innerText = document.getElementById("telefone").value.trim();
       document.getElementById("resumo-nascimento").innerText = document.getElementById("nascimento").value;
-      document.getElementById("resumo-convidado").innerText = document.getElementById("convidado").value;
+      document.getElementById("resumo-convidado").innerText = document.getElementById("convidado").selectedOptions[0].text;
       document.getElementById("resumo-camiseta").innerText = document.getElementById("camiseta").value;
       const generoSelecionado = document.querySelector('input[name="genero"]:checked');
       if (generoSelecionado) {
