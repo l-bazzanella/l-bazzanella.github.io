@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tag do Caos</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin-top: 0;
+        margin-left: 10vw;
+        margin-right: 10vw;
+        padding: 0;
+        background-color: #f5f5f0;
+        font-family: "Arial", sans-serif;
+        color: #0f2d1e;
+        font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .background-image {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url(https://i.ibb.co/pvpC45Yy/Garra.png);
+        background-size: cover;
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        opacity: 0.2;
+        z-index: 0;
+        scale: calc(0.9);
+        margin-top: -10vh;
+      }
+
+      .spinner-container {
+        padding-top: 30vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: fadeOut 1s ease-in-out 3s forwards;
+        z-index: 1;
+      }
+
+      .spinner {
+        width: 100px;
+        height: 100px;
+        border: 8px solid transparent;
+        border-top: 8px solid #0f2d1e;
+        border-radius: 50%;
+        animation: spin 4.5s ease-out;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(1440deg);
+        }
+      }
+
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+
+      .content {
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        text-align: left;
+        padding: 2rem;
+        width: 100%;
+        max-width: 600px;
+        z-index: 1;
+        animation: fadeIn 1s ease-in-out forwards;
+      }
+
+      .content h1 {
+        font-size: 3rem;
+        font-family: "Rajdhani", sans-serif;
+        align-self: center;
+        margin-bottom: 1rem;
+      }
+
+      .box {
+        width: 75vw;
+        border: 2px solid #0f2d1e;
+        padding: 10px;
+      }
+
+      .animated-text span {
+        display: unset;
+        /* overflow: hidden; */ 
+        white-space: nowrap;
+        /* animation: typing 4s steps(30, end); */
+      }
+
+      @keyframes typing {
+        from {
+          display: inline-block;
+          width: 0;
+        }
+        to {
+          display : unset;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="background-image"></div>
+
+    <div class="spinner-container" id="loading">
+      <div class="spinner"></div>
+      <p>Carregando desafio...</p>
+    </div>
+
+    <div class="content" id="mainContent">
+      <h1>Tag do Caos</h1>
+      <div class="box">
+        <p>
+          <strong>Desafio:</strong>
+          <span id="challenge" class="animated-text"><span></span></span>
+        </p>
+        <p>
+          <strong>Consequência:</strong>
+          <span id="description" class="animated-text"><span></span></span>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const params = new URLSearchParams(window.location.search);
+        const reference = params.get("reference") || "default";
+        console.log("Reference:", reference);
+
+        setTimeout(() => {
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("mainContent").style.display = "flex";
+
+          const params = new URLSearchParams(window.location.search);
+          const reference = params.get("reference") || "default";
+          const url = `https://script.google.com/macros/s/AKfycbzdqnGV9ad3Wn2MjmvMd6jPMxxwxWCoGaKm6-Z8uYkbIFNxKa7hGHgR-vMjue62A3R5/exec`;
+          const newParams = new URLSearchParams({
+            reference: reference,
+          });
+          console.log("URL:", url);
+          console.log("Params:", newParams.toString());
+          console.log("reference:", reference);
+
+          const googleScriptURL = `${url}?${params.toString()}`;
+
+          fetch(googleScriptURL)
+            .then((res) => res.json())
+            .then((data) => {
+              const desafio = document.querySelector("#challenge span");
+              const consequencia = document.querySelector("#description span");
+              desafio.textContent = data.challenge || "Erro ao carregar";
+              consequencia.textContent =
+                data.description || "Erro ao carregar";
+            })
+            .catch(() => {
+              const desafio = document.querySelector("#challenge span");
+              const consequencia = document.querySelector("#description span");
+              desafio.textContent = "Erro ao carregar";
+              consequencia.textContent = "Erro ao carregar";
+            });
+        }, 3500);
+
+        const challengeAndDescription = document.querySelectorAll("#challenge span, #description span");
+
+        challengeAndDescription.forEach((span) => {
+          span.style.overflow = "hidden";
+          span.style.whiteSpace = "nowrap";
+          span.style.animation = "typing 8s steps(30, end)";
+        });
+
+      });
+    </script>
+  </body>
+</html>

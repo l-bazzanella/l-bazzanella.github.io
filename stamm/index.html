@@ -299,13 +299,6 @@ button[type="submit"] {
         Tamanho da camiseta:
         <select id="camiseta" required>
           <option value="">--Selecione--</option>
-          <option value="PP">PP</option>
-          <option value="P">P</option>
-          <option value="M">M</option>
-          <option value="G">G</option>
-          <option value="GG">GG</option>
-          <option value="XG">XG</option>
-          <option value="Outro">Outro (Espcificar nas observações)</option>
         </select>
         <div class="logo-evento" style="padding-top:20px">
           <img class="logo-evento-img" src="https://i.ibb.co/4vJndJN/tamanhos.jpg" alt="Logo do Evento">
@@ -385,45 +378,62 @@ button[type="submit"] {
       setFormDisabled(true); // Bloqueia o formulário
       document.getElementById('loading-overlay').style.display = 'flex';
   
-      const infoLote = await fetch("https://script.google.com/macros/s/AKfycbxTRxMi9Ta6xlKp3IsDMxqQBG0zC9uFxjUW1oMBHGdQ2W1bS7XpuLK9lRg1Qyl-Qlr_hQ/exec")
+      const infoLote = await fetch("https://script.google.com/macros/s/AKfycby1KKc-LPXVA4SsyqjLsESPXFNZmv__FeOifsNjIzJs0kIj_-SLB3gZX1rznnvAGL0S5A/exec")
             .then(r => r.json())
             .catch(() => ({ promoName: null, token: null, isPromo: null, price:null }));
 
-        document.getElementById("lote").value = infoLote.token;
-        document.getElementById("preco").innerText = infoLote.price;
-        document.getElementById("promo-name").innerText = infoLote.promoName;
+      const selectCamiseta = document.getElementById('camiseta');
+      selectCamiseta.innerHTML = '<option value="">--Selecione--</option>';
+
+      if (Array.isArray(infoLote.tshirtSizesAvaliable)) {
+        infoLote.tshirtSizesAvaliable.forEach(size => {
+          const opt = document.createElement('option');
+          opt.value = size;
+          opt.textContent = size;
+          selectCamiseta.appendChild(opt);
+        });
+        // Adiciona a opção "Outro" ao final
+        const optOutro = document.createElement('option');
+        optOutro.value = "Outro";
+        optOutro.textContent = "Outro (Especificar nas observações)";
+        selectCamiseta.appendChild(optOutro);
+      }
+
+      document.getElementById("lote").value = infoLote.token;
+      document.getElementById("preco").innerText = infoLote.price;
+      document.getElementById("promo-name").innerText = infoLote.promoName;
       
-        if (infoLote.isPromo) {
-            const pagamento = document.getElementById('pagamento');
-            document.getElementById("is-promo").innerText = "SIM - Pagamento a vista.";
-            document.getElementById("forma-pagamento").innerText = "Forma de pagamento (ingresso promocional, pagamento apenas a vista no pix):";
-            pagamento.value = "PIX";
-        } else {
-          document.getElementById("is-promo").innerText = "Não";
+      if (infoLote.isPromo) {
+          const pagamento = document.getElementById('pagamento');
+          document.getElementById("is-promo").innerText = "SIM - Pagamento a vista.";
+          document.getElementById("forma-pagamento").innerText = "Forma de pagamento (ingresso promocional, pagamento apenas a vista no pix):";
+          pagamento.value = "PIX";
+      } else {
+        document.getElementById("is-promo").innerText = "Não";
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const reference = params.get('reference');
+      const selectConvidado = document.getElementById('convidado');
+      let bloqueiaConvidado = false;
+
+      if (reference) {
+        // Procura se existe uma opção com o valor igual ao reference (case insensitive)
+        const option = Array.from(selectConvidado.options).find(
+            opt => opt.value.toLowerCase() === reference.toLowerCase()
+        );
+        if (option) {
+            selectConvidado.value = option.value;
+            bloqueiaConvidado = true;
+            // Dispara evento para atualizar o resumo
+            selectConvidado.dispatchEvent(new Event('change'));
         }
+      }
 
-        const params = new URLSearchParams(window.location.search);
-        const reference = params.get('reference');
-        const selectConvidado = document.getElementById('convidado');
-        let bloqueiaConvidado = false;
-
-        if (reference) {
-          // Procura se existe uma opção com o valor igual ao reference (case insensitive)
-          const option = Array.from(selectConvidado.options).find(
-              opt => opt.value.toLowerCase() === reference.toLowerCase()
-          );
-          if (option) {
-              selectConvidado.value = option.value;
-              bloqueiaConvidado = true;
-              // Dispara evento para atualizar o resumo
-              selectConvidado.dispatchEvent(new Event('change'));
-          }
-        }
-
-        setFormDisabled(false); // Desbloqueia o formulário
-        pagamento.disabled = infoLote.isPromo;
-        selectConvidado.disabled = bloqueiaConvidado;
-        document.getElementById('loading-overlay').style.display = 'none';
+      setFormDisabled(false); // Desbloqueia o formulário
+      pagamento.disabled = infoLote.isPromo;
+      selectConvidado.disabled = bloqueiaConvidado;
+      document.getElementById('loading-overlay').style.display = 'none';
     });
 
     function setFormDisabled(disabled) {
@@ -512,7 +522,7 @@ button[type="submit"] {
         observacao: document.getElementById("observacao").value,
         lote
     });
-                        //https://script.google.com/macros/s/AKfycbx--6VVYoPeiMdk5lFdpqYbfLGdlGrvYkydnpzrOPVd7NUErDM-jW3SqgNrnNBYn9AeKQ/exec
+
     const googleScriptURL = "https://script.google.com/macros/s/AKfycbx7oIRo2o6-2-SfAuKvH7gq2SPFJdZ5z83-tBp5yMgqW7CYtBhP_3qf_R10B8fPwpwPcQ/exec";
 
     fetch(`${googleScriptURL}?${params.toString()}`)
