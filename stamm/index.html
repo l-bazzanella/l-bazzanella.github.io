@@ -378,7 +378,7 @@ button[type="submit"] {
       setFormDisabled(true); // Bloqueia o formulário
       document.getElementById('loading-overlay').style.display = 'flex';
   
-      const infoLote = await fetch("https://script.google.com/macros/s/AKfycbyR_t1z1CMpR61pQRNU32tbljKm7cQqdmnFj6TcnyOwvRfp9s7QAElMVnzFjWbk22AvXg/exec")
+      const infoLote = await fetch("https://script.google.com/macros/s/AKfycbz8XYuWUU_A0gs21KqYIUqMaq-wBx7hOdejOf2XFa8Z4HAro_YN2mirOpDftvcGQ9N5Fg/exec")
             .then(r => r.json())
             .catch(() => ({ promoName: null, token: null, isPromo: null, price:null }));
 
