@@ -14,9 +14,9 @@
         margin-left: 10vw;
         margin-right: 10vw;
         padding: 0;
-        background-color: #f5f5f0;
+        background-color: #ededed;
         font-family: "Arial", sans-serif;
-        color: #0f2d1e;
+        color: #253727;
         font-weight: bold;
         display: flex;
         flex-direction: column;
@@ -80,9 +80,9 @@
       .content {
         display: none;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         gap: 1rem;
-        text-align: left;
+        text-align: center;
         padding: 2rem;
         width: 100%;
         max-width: 600px;
@@ -98,8 +98,8 @@
       }
 
       .box {
-        width: 75vw;
-        border: 2px solid #0f2d1e;
+        width: 74vw;
+        border: 2px solid #253727;
         padding: 10px;
       }
 
@@ -108,6 +108,24 @@
         /* overflow: hidden; */ 
         white-space: nowrap;
         /* animation: typing 4s steps(30, end); */
+      }
+
+      .logo-tagdocaos{
+        max-width: 100%;
+        height: auto;
+      }
+
+      .insta-tagdocaos {
+        height: 80px;
+        border-radius: 50%;
+      }
+
+      .insta-footer-tagdocaos {
+        text-align: left;
+        width: 100%;
+        align-items: flex-start;
+        display: flex;
+        font-size: smaller;
       }
 
       @keyframes typing {
@@ -120,6 +138,43 @@
           width: 100%;
         }
       }
+
+      /* Estilos para o modal */
+      #modal-copied {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #modal-copied > div {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 70vw;
+      }
+
+      #modal-copied p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+      }
+
+      #modal-ok {
+        padding: 0.7rem 2rem;
+        font-size: 1rem;
+        background: #253727;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
@@ -131,20 +186,56 @@
     </div>
 
     <div class="content" id="mainContent">
-      <h1>Tag do Caos</h1>
+      <img class="logo-tagdocaos" src="https://i.ibb.co/WvG4RFSj/Logo-Tag-Do-Caos.png" alt="logo" />
       <div class="box">
         <p>
-          <strong>Desafio:</strong>
+          <strong>Desafio</strong><br/><br/>
           <span id="challenge" class="animated-text"><span></span></span>
         </p>
         <p>
-          <strong>Consequência:</strong>
+          <strong>Consequência</strong><br/><br/>
           <span id="description" class="animated-text"><span></span></span>
         </p>
+      </div>
+      <div id="footer" class="insta-footer-tagdocaos">
+        <a id="insta-link" href="https://www.instagram.com/" target="_blank">
+          <img class="insta-tagdocaos" src="https://i.ibb.co/7xCnb6rZ/avatar-insta-aaasc.png" alt="logo" />
+        </a>
+        <p><span>
+          <b>ESSE MERECE O REGISTRO, FAZ UM STORY E MARCA NOIX!</b>
+        </span></p>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal-copied" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+      <div style="background:#fff; padding:2rem; border-radius:10px; text-align:center; max-width:90vw;">
+        <p style="font-size:1.2rem; margin-bottom:2rem;">@aaascfurb copiado, agora só fazer o story e marcar a gente!</p>
+        <button id="modal-ok" style="padding:0.7rem 2rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer;">OK</button>
       </div>
     </div>
 
     <script>
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const instaLink = document.getElementById('insta-link');
+        const modal = document.getElementById('modal-copied');
+        const modalOk = document.getElementById('modal-ok');
+        if (instaLink) {
+          instaLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            navigator.clipboard.writeText("@aaascfurb");
+            modal.style.display = "flex";
+          });
+        }
+        if (modalOk) {
+          modalOk.addEventListener('click', function() {
+            modal.style.display = "none";
+            window.open("https://www.instagram.com", "_blank");
+          });
+        }
+      });
+
       document.addEventListener("DOMContentLoaded", function () {
         const params = new URLSearchParams(window.location.search);
         const reference = params.get("reference") || "default";
