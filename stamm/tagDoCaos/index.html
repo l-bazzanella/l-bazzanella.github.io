@@ -238,16 +238,16 @@
 
       document.addEventListener("DOMContentLoaded", function () {
         const params = new URLSearchParams(window.location.search);
-        const reference = params.get("reference") || "default";
-        console.log("Reference:", reference);
+        
+
 
         setTimeout(() => {
           document.getElementById("loading").style.display = "none";
           document.getElementById("mainContent").style.display = "flex";
 
           const params = new URLSearchParams(window.location.search);
-          const reference = params.get("reference") || "default";
-          const url = `https://script.google.com/macros/s/AKfycbzdqnGV9ad3Wn2MjmvMd6jPMxxwxWCoGaKm6-Z8uYkbIFNxKa7hGHgR-vMjue62A3R5/exec`;
+          const reference = params.get("reference") || 0;
+          const url = `https://script.google.com/macros/s/AKfycbxx6OyVvfmsCldu0bAywDy5xghZ31dfduKImOUjpIY4iVPkI1VxOKxB9gy0Wq4gTqpG/exec`;
           const newParams = new URLSearchParams({
             reference: reference,
           });
@@ -255,7 +255,7 @@
           console.log("Params:", newParams.toString());
           console.log("reference:", reference);
 
-          const googleScriptURL = `${url}?${params.toString()}`;
+          const googleScriptURL = `${url}?${newParams.toString()}`;
 
           fetch(googleScriptURL)
             .then((res) => res.json())
