@@ -105,9 +105,9 @@
 
       .animated-text span {
         display: unset;
-        /* overflow: hidden; */ 
+        overflow: hidden; 
         white-space: nowrap;
-        /* animation: typing 4s steps(30, end); */
+        animation: typing 6s steps(30, end);
       }
 
       .logo-tagdocaos{
@@ -129,12 +129,15 @@
       }
 
       @keyframes typing {
-        from {
+        0% {
           display: inline-block;
           width: 0;
         }
-        to {
-          display : unset;
+        90% {
+          width: 100%;
+        }
+        100% {
+          display: unset;
           width: 100%;
         }
       }
@@ -181,18 +184,19 @@
     <div class="background-image"></div>
 
     <div class="spinner-container" id="loading">
-      <div class="spinner"></div>
-      <p>Carregando desafio...</p>
+      <div class="spinner" id="spinner"></div>
+      <p id="loading-text">Carregando desafio...</p>
+      <button id="retry-btn" style="display:none; padding:0.7rem 2rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer;">Tentar novamente</button>
     </div>
 
     <div class="content" id="mainContent">
       <img class="logo-tagdocaos" src="https://i.ibb.co/WvG4RFSj/Logo-Tag-Do-Caos.png" alt="logo" />
       <div class="box">
-        <p>
+        <p style="height: 20vh;">
           <strong>Desafio</strong><br/><br/>
           <span id="challenge" class="animated-text"><span></span></span>
         </p>
-        <p>
+        <p style="height: 20vh;">
           <strong>Consequência</strong><br/><br/>
           <span id="description" class="animated-text"><span></span></span>
         </p>
@@ -237,24 +241,34 @@
       });
 
       document.addEventListener("DOMContentLoaded", function () {
-        const params = new URLSearchParams(window.location.search);
-        
+        const loading = document.getElementById("loading");
+        const mainContent = document.getElementById("mainContent");
+        const spinner = document.getElementById("spinner");
+        const loadingText = document.getElementById("loading-text");
+        const retryBtn = document.getElementById("retry-btn");
 
+        function showLoading() {
+          loading.style.display = "flex";
+          spinner.style.display = "block";
+          loadingText.style.display = "block";
+          retryBtn.style.display = "none";
+        }
+        function showRetry() {
+          spinner.style.display = "none";
+          loadingText.textContent = "Erro ao carregar desafio.";
+          retryBtn.style.display = "inline-block";
+        }
+        function hideLoading() {
+          loading.style.display = "none";
+          mainContent.style.display = "flex";
+        }
 
-        setTimeout(() => {
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("mainContent").style.display = "flex";
-
+        function fetchChallenge() {
+          showLoading();
           const params = new URLSearchParams(window.location.search);
           const reference = params.get("reference") || 0;
           const url = `https://script.google.com/macros/s/AKfycbxx6OyVvfmsCldu0bAywDy5xghZ31dfduKImOUjpIY4iVPkI1VxOKxB9gy0Wq4gTqpG/exec`;
-          const newParams = new URLSearchParams({
-            reference: reference,
-          });
-          console.log("URL:", url);
-          console.log("Params:", newParams.toString());
-          console.log("reference:", reference);
-
+          const newParams = new URLSearchParams({ reference: reference });
           const googleScriptURL = `${url}?${newParams.toString()}`;
 
           fetch(googleScriptURL)
@@ -263,25 +277,27 @@
               const desafio = document.querySelector("#challenge span");
               const consequencia = document.querySelector("#description span");
               desafio.textContent = data.challenge || "Erro ao carregar";
-              consequencia.textContent =
-                data.description || "Erro ao carregar";
+              consequencia.textContent = data.description || "Erro ao carregar";
+              hideLoading();
             })
             .catch(() => {
-              const desafio = document.querySelector("#challenge span");
-              const consequencia = document.querySelector("#description span");
-              desafio.textContent = "Erro ao carregar";
-              consequencia.textContent = "Erro ao carregar";
+              showRetry();
             });
-        }, 3500);
+        }
 
-        const challengeAndDescription = document.querySelectorAll("#challenge span, #description span");
-
-        challengeAndDescription.forEach((span) => {
-          span.style.overflow = "hidden";
-          span.style.whiteSpace = "nowrap";
-          span.style.animation = "typing 8s steps(30, end)";
+        retryBtn.addEventListener("click", function () {
+          loadingText.textContent = "Carregando desafio...";
+          fetchChallenge();
         });
 
+        fetchChallenge();
+
+        // const challengeAndDescription = document.querySelectorAll("#challenge span, #description span");
+        // challengeAndDescription.forEach((span) => {
+        //   span.style.overflow = "hidden";
+        //   span.style.whiteSpace = "nowrap";
+        //   span.style.animation = "typing 6s steps(30, end)";
+        // });
       });
     </script>
   </body>
