@@ -8,177 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      body {
-        margin-top: 0;
-        margin-left: 10vw;
-        margin-right: 10vw;
-        padding: 0;
-        background-color: #ededed;
-        font-family: "Arial", sans-serif;
-        color: #253727;
-        font-weight: bold;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        height: 100vh;
-        overflow: hidden;
-        position: relative;
-      }
-
-      .background-image {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url(https://i.ibb.co/pvpC45Yy/Garra.png);
-        background-size: cover;
-        background-position: center;
-        background-size: contain;
-        background-repeat: no-repeat;
-        opacity: 0.2;
-        z-index: 0;
-        scale: calc(0.9);
-        margin-top: -10vh;
-      }
-
-      .spinner-container {
-        padding-top: 30vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        animation: fadeOut 1s ease-in-out 3s forwards;
-        z-index: 1;
-      }
-
-      .spinner {
-        width: 100px;
-        height: 100px;
-        border: 8px solid transparent;
-        border-top: 8px solid #0f2d1e;
-        border-radius: 50%;
-        animation: spin 4.5s ease-out;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(1440deg);
-        }
-      }
-
-      @keyframes fadeOut {
-        to {
-          opacity: 0;
-          visibility: hidden;
-        }
-      }
-
-      .content {
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        text-align: center;
-        padding: 2rem;
-        width: 100%;
-        max-width: 600px;
-        z-index: 1;
-        animation: fadeIn 1s ease-in-out forwards;
-      }
-
-      .content h1 {
-        font-size: 3rem;
-        font-family: "Rajdhani", sans-serif;
-        align-self: center;
-        margin-bottom: 1rem;
-      }
-
-      .box {
-        width: 74vw;
-        border: 2px solid #253727;
-        padding: 10px;
-      }
-
-      .animated-text span {
-        display: unset;
-        overflow: hidden; 
-        white-space: nowrap;
-        animation: typing 6s steps(30, end);
-      }
-
-      .logo-tagdocaos{
-        max-width: 100%;
-        height: auto;
-      }
-
-      .insta-tagdocaos {
-        height: 80px;
-        border-radius: 50%;
-      }
-
-      .insta-footer-tagdocaos {
-        text-align: left;
-        width: 100%;
-        align-items: flex-start;
-        display: flex;
-        font-size: smaller;
-      }
-
-      @keyframes typing {
-        0% {
-          display: inline-block;
-          width: 0;
-        }
-        90% {
-          width: 100%;
-        }
-        100% {
-          display: unset;
-          width: 100%;
-        }
-      }
-
-      /* Estilos para o modal */
-      #modal-copied {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-      }
-
-      #modal-copied > div {
-        background: #fff;
-        padding: 2rem;
-        border-radius: 10px;
-        text-align: center;
-        max-width: 70vw;
-      }
-
-      #modal-copied p {
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
-      }
-
-      #modal-ok {
-        padding: 0.7rem 2rem;
-        font-size: 1rem;
-        background: #253727;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="background-image"></div>
@@ -219,86 +49,25 @@
       </div>
     </div>
 
-    <script>
+    <!-- Novo Modal Customizável -->
+    <div id="modal-custom" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+      <div style="background:#fff; padding:2rem; border-radius:10px; text-align:center; max-width:90vw;">
+        <p id="modal-custom-message" style="font-size:1.2rem; margin-bottom:2rem;">Mensagem customizada</p>
+        <div id="modal-custom-error" style="color:#c00; font-size:1rem; margin-bottom:1rem;"></div>
+        <input id="modal-nickname" type="text" placeholder="Seu nickname" style="display:block; width:100%; margin-bottom:1rem; padding:0.5rem; font-size:1rem; border:1px solid #ccc; border-radius:5px;" />
+        <input id="modal-phone" type="text" inputmode="numeric" pattern="\\d*" maxlength="11" placeholder="Seu telefone" style="display:block; width:100%; margin-bottom:2rem; padding:0.5rem; font-size:1rem; border:1px solid #ccc; border-radius:5px;" />
+        <button id="modal-custom-ok" style="padding:0.7rem 2rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer;">OK</button>
+      </div>
+    </div>
 
-      document.addEventListener('DOMContentLoaded', function() {
-        const instaLink = document.getElementById('insta-link');
-        const modal = document.getElementById('modal-copied');
-        const modalOk = document.getElementById('modal-ok');
-        if (instaLink) {
-          instaLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            navigator.clipboard.writeText("@aaascfurb");
-            modal.style.display = "flex";
-          });
-        }
-        if (modalOk) {
-          modalOk.addEventListener('click', function() {
-            modal.style.display = "none";
-            window.open("https://www.instagram.com", "_blank");
-          });
-        }
-      });
+    <!-- Modal de Parabéns -->
+    <div id="modal-parabens" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#fff; z-index:10000; justify-content:center; align-items:center; flex-direction:column;">
+      <div style="width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <p id="modal-parabens-message" style="font-size:2rem; margin-bottom:2rem; color:#253727;">Parabéns! Agora você já pode fechar e participar dos desafios!</p>
+        <button id="modal-parabens-ok" style="padding:1rem 3rem; font-size:1.2rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer;">OK</button>
+      </div>
+    </div>
 
-      document.addEventListener("DOMContentLoaded", function () {
-        const loading = document.getElementById("loading");
-        const mainContent = document.getElementById("mainContent");
-        const spinner = document.getElementById("spinner");
-        const loadingText = document.getElementById("loading-text");
-        const retryBtn = document.getElementById("retry-btn");
-
-        function showLoading() {
-          loading.style.display = "flex";
-          spinner.style.display = "block";
-          loadingText.style.display = "block";
-          retryBtn.style.display = "none";
-        }
-        function showRetry() {
-          spinner.style.display = "none";
-          loadingText.textContent = "Erro ao carregar desafio.";
-          retryBtn.style.display = "inline-block";
-        }
-        function hideLoading() {
-          loading.style.display = "none";
-          mainContent.style.display = "flex";
-        }
-
-        function fetchChallenge() {
-          showLoading();
-          const params = new URLSearchParams(window.location.search);
-          const reference = params.get("reference") || 0;
-          const url = `https://script.google.com/macros/s/AKfycbxx6OyVvfmsCldu0bAywDy5xghZ31dfduKImOUjpIY4iVPkI1VxOKxB9gy0Wq4gTqpG/exec`;
-          const newParams = new URLSearchParams({ reference: reference });
-          const googleScriptURL = `${url}?${newParams.toString()}`;
-
-          fetch(googleScriptURL)
-            .then((res) => res.json())
-            .then((data) => {
-              const desafio = document.querySelector("#challenge span");
-              const consequencia = document.querySelector("#description span");
-              desafio.textContent = data.challenge || "Erro ao carregar";
-              consequencia.textContent = data.description || "Erro ao carregar";
-              hideLoading();
-            })
-            .catch(() => {
-              showRetry();
-            });
-        }
-
-        retryBtn.addEventListener("click", function () {
-          loadingText.textContent = "Carregando desafio...";
-          fetchChallenge();
-        });
-
-        fetchChallenge();
-
-        // const challengeAndDescription = document.querySelectorAll("#challenge span, #description span");
-        // challengeAndDescription.forEach((span) => {
-        //   span.style.overflow = "hidden";
-        //   span.style.whiteSpace = "nowrap";
-        //   span.style.animation = "typing 6s steps(30, end)";
-        // });
-      });
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
