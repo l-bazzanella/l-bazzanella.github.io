@@ -355,6 +355,14 @@ button[type="submit"] {
         "Ih já era levou tapa da Pantera  - AAASC - 2025"
       </div>
     </div>
+  <div id="modal-encerrado" style="display:none; position:fixed; z-index:10000; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:40px 30px; border-radius:10px; max-width:400px; text-align:center; box-shadow:0 4px 16px #0008;">
+      <h2 style="color:#d32f2f;">Inscrições Encerradas</h2>
+      <p>As inscrições pelo formulário estão encerradas.<br>Entre em contato pelo WhatsApp para verificar disponibilidade:</p>
+      <p style="font-size:1.2em; color:#36643b; font-weight:bold;">Kamilly: 47991022089<br>Rian: 47996928462</p>
+      <button onclick="document.getElementById('modal-encerrado').style.display='none'" style="margin-top:20px; padding:10px 30px; background:#36643b; color:#fff; border:none; border-radius:6px; font-size:1em; cursor:pointer;">Fechar</button>
+    </div>
+  </div>
   <script>
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -381,6 +389,19 @@ button[type="submit"] {
       const infoLote = await fetch("https://script.google.com/macros/s/AKfycbz8XYuWUU_A0gs21KqYIUqMaq-wBx7hOdejOf2XFa8Z4HAro_YN2mirOpDftvcGQ9N5Fg/exec")
             .then(r => r.json())
             .catch(() => ({ promoName: null, token: null, isPromo: null, price:null }));
+
+      // NOVO: Se o lote estiver encerrado, mostra modal e bloqueia envio
+      if (infoLote.promoName && infoLote.promoName.toLowerCase().includes('encerrado')) {
+        document.getElementById('modal-encerrado').style.display = 'flex';
+        setFormDisabled(true);
+        // Bloqueia o submit do formulário
+        document.querySelector('form').onsubmit = function(e) {
+          e.preventDefault();
+          document.getElementById('modal-encerrado').style.display = 'flex';
+        };
+        document.getElementById('loading-overlay').style.display = 'none';
+        return;
+      }
 
       const selectCamiseta = document.getElementById('camiseta');
       selectCamiseta.innerHTML = '<option value="">--Selecione--</option>';
