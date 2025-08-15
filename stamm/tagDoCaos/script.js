@@ -1,4 +1,142 @@
 /**
+ * Busca o player atualizado da API
+ * @param {string} phone - Telefone do jogador
+ * @returns {Promise} Promise com os dados do player
+ */
+function showBoxLoading(boxId, msg) {
+    const box = document.getElementById(boxId);
+    if (!box) return;
+    let loading = box.querySelector('.box-loading');
+    if (!loading) {
+        loading = document.createElement('div');
+        loading.className = 'box-loading';
+        loading.innerHTML = `<div class="spinner box-spinner"></div><div style="text-align:center; color:#253727; font-size:1rem; margin-top:0.7rem;">${msg || '...'}</div>`;
+        box.appendChild(loading);
+    }
+    loading.style.display = 'flex';
+    loading.style.flexDirection = 'column';
+    loading.style.alignItems = 'center';
+    loading.style.justifyContent = 'center';
+    // Oculta o conteúdo do box, exceto o loading
+    Array.from(box.children).forEach(child => {
+        if (child !== loading) child.style.display = 'none';
+    });
+}
+function hideBoxLoading(boxId) {
+    const box = document.getElementById(boxId);
+    if (!box) return;
+    const loading = box.querySelector('.box-loading');
+    if (loading) loading.style.display = 'none';
+    // Mostra o conteúdo do box
+    Array.from(box.children).forEach(child => {
+        if (child !== loading) child.style.display = '';
+    });
+}
+function fetchPlayer(phone) {
+    const playerParams = new URLSearchParams({
+        function_: 'getPlayer',
+        phone: phone
+    });
+    const playerURL = `${url}?${playerParams.toString()}`;
+    return fetch(playerURL)
+        .then(res => res.json())
+        .then(data => {
+            hideBoxLoading('player-box');
+            if (data.status === 'player_found' && data.player) {
+                saveToLocalStorage('player', data.player);
+                return data.player;
+            } else {
+                throw new Error(data.error || 'Erro ao buscar player');
+            }
+        })
+        .catch(err => {
+            hideBoxLoading('player-box');
+            console.error('Erro ao buscar player:', err);
+            // Tenta buscar do cache se a API falhar
+            const cached = getFromLocalStorage('player');
+            return cached && cached.value ? cached.value : null;
+        });
+}
+/**
+ * Busca o ranking atual da API
+ * @param {number} limit_ - Número máximo de jogadores (padrão: 10)
+ * @returns {Promise} Promise com os dados do ranking
+ */
+function fetchRanking(limit_) {
+    const rankingParams = new URLSearchParams({
+        function_: 'getRanking',
+        limit: limit_
+    });
+    const rankingURL = `${url}?${rankingParams.toString()}`;
+    return fetch(rankingURL)
+        .then(res => res.json())
+        .then(data => {
+            hideBoxLoading('ranking-box');
+            if (data.status === 'ranking_success' && data.ranking) {
+                // Salva no localStorage para cache
+                saveToLocalStorage('ranking', data.ranking);
+                return data.ranking;
+            } else {
+                throw new Error(data.error || 'Erro ao buscar ranking');
+            }
+        })
+        .catch(err => {
+            hideBoxLoading('ranking-box');
+            console.error('Erro ao buscar ranking:', err);
+            // Tenta buscar do cache se a API falhar
+            const cached = getFromLocalStorage('ranking');
+            return cached && cached.value ? cached.value : [];
+        });
+}
+
+/**
+ * Atualiza a exibição do ranking na tela home
+ * @param {Array} ranking - Array com dados do ranking
+ * @param {string} currentPlayerPhone - Telefone do jogador atual para destacar
+ */
+function updateRankingDisplay(ranking, currentPlayerPhone = '') {
+    const rankingList = document.getElementById('ranking-list');
+    if (!rankingList) return;
+    if (!Array.isArray(ranking) || ranking.length === 0) {
+        rankingList.innerHTML = '<li style="color:#aaa;">Ranking indisponível</li>';
+        return;
+    }
+    rankingList.innerHTML = '';
+    ranking.forEach((player, index) => {
+        const li = document.createElement('div');
+        const isCurrentPlayer = currentPlayerPhone && player.phone === currentPlayerPhone;
+        li.innerHTML = `
+            <span class="ranking-position">#${player.position}</span>
+            <span class="ranking-nickname" style="font-weight:700;">${player.nickname || 'Player'}</span>
+            <span class="ranking-score" style="color:#3e5c3a; font-weight:600;">${player.score}</span>
+            ${isCurrentPlayer ? '<span style="color:#0f2d1e; font-size:1.1em;"></span>' : ''}
+        `;
+        if (isCurrentPlayer) {
+            li.style.backgroundColor = 'rgb(151 207 202)';
+            li.style.border = '2px solid rgb(37 55 39)';
+            li.style.borderRadius = '0px';
+            li.style.padding = '2px 2px';
+            li.style.color = '#253727';
+        }
+        rankingList.appendChild(li);
+    });
+}
+
+/**
+ * Função para atualizar ranking manualmente (botão de refresh, etc.)
+ */
+function refreshRanking() {
+    const rankingList = document.getElementById('ranking-list');
+    if (rankingList) {
+        rankingList.innerHTML = '<li style="color:#aaa;">Atualizando ranking...</li>';
+    }
+    fetchRanking(400).then(ranking => {
+        const currentPlayer = getFromLocalStorage('player');
+        const currentPhone = currentPlayer && currentPlayer.value ? currentPlayer.value.phone : (currentPlayer && currentPlayer.phone ? currentPlayer.phone : '');
+        updateRankingDisplay(ranking, currentPhone);
+    });
+}
+/**
  * Esconde a mensagem de swipe (aceito/arregou) imediatamente.
  */
 function hideSwipeMessage() {
@@ -67,9 +205,9 @@ function getFromLocalStorage(key) {
 // =====================
 
 let challengeList = getFromLocalStorage('challengeList') || [];
+let bloqueioDesafioDuplicado = false;
 
-
-const url = `https://script.google.com/macros/s/AKfycbw0xsu_ibtLMuLLxgHxjPUSQiKt-Mac4c6sqJ5fZnaXJrHkT0wLBda8VTU6-_ErRW08/exec`;
+const url = `https://script.google.com/macros/s/AKfycbytIsgWKZUCOqbuqZPGkX4xcQDCn6Wm22pI-bPpjomYEi6AQ7a7qu2BJcvHmoJ0qvps/exec`;
 const params = new URLSearchParams(window.location.search);
 
 
@@ -124,6 +262,10 @@ function handleSwipeChallenge(function_, challengerPhone, tagID) {
         .then(data => {
             console.log('[Swipe result]', data);
             if (data.status === 'challenge_accepted' || data.status === 'challenge_skipped') {
+                // Salva o tagID como último desafiado somente após aceitar ou recusar
+                if (tagID) {
+                    saveToLocalStorage('lastChallengedTagID', tagID);
+                }
                 // Após o alerta, navega para home ou recarrega
                 const player = getFromLocalStorage('player');
                 let nickname = (player && player.value && player.value.nickname) ? player.value.nickname : (player && player.nickname ? player.nickname : '');
@@ -198,24 +340,36 @@ document.addEventListener("DOMContentLoaded", function () {
     const loadingText = document.getElementById("loading-text");
     const retryBtn = document.getElementById("retry-btn");
 
-    // --- BLOQUEIO DE DESAFIO DUPLICADO ---
-    const lastChallengedTag = getFromLocalStorage('lastChallengedTagID');
-    if (tagID && lastChallengedTag && lastChallengedTag.value === tagID) {
-        // Se tentar desafiar o mesmo player, permanece na home
-        const player = getFromLocalStorage('player');
-        let nickname = (player && player.value && player.value.nickname) ? player.value.nickname : (player && player.nickname ? player.nickname : '');
-        let score = (player && player.value && player.value.score) ? player.value.score : (player && player.score ? player.score : '');
-        let skipPoints = (player && player.value && player.value.skipPoints) ? player.value.skipPoints : (player && player.skipPoints ? player.skipPoints : 0);
-        // Esconde o loading e mostra home
-        if (loading) loading.style.display = 'none';
-        if (mainContent) mainContent.style.display = 'none';
-        document.getElementById('homeContent').style.display = 'flex';
-        showHome(nickname, score, skipPoints, {});
-        return;
-    } else if (tagID) {
-        // Salva o novo tagID como último desafiado
-        saveToLocalStorage('lastChallengedTagID', tagID);
-    }
+    // BLOQUEIO DE DESAFIO DUPLICADO - GARANTE QUE showHome JÁ FOI DEFINIDA
+    
+    window.addEventListener('load', function () {
+        const lastChallengedTag = getFromLocalStorage('lastChallengedTagID');
+        if (tagID && lastChallengedTag && lastChallengedTag.value === tagID) {
+            // Se tentar desafiar o mesmo player, permanece na home
+            const player = getFromLocalStorage('player');
+            let nickname = (player && player.value && player.value.nickname) ? player.value.nickname : (player && player.nickname ? player.nickname : '');
+            let score = (player && player.value && player.value.score) ? player.value.score : (player && player.score ? player.score : '');
+            let skipPoints = (player && player.value && player.value.skipPoints) ? player.value.skipPoints : (player && player.skipPoints ? player.skipPoints : 0);
+            // Esconde o loading e mostra home
+            if (loading) loading.style.display = 'none';
+            if (mainContent) mainContent.style.display = 'none';
+            document.getElementById('homeContent').style.display = 'flex';
+            // Sempre busca os dados do player atualizados do localStorage
+            const playerAtual = getFromLocalStorage('player');
+            console.log('[Player]', playerAtual);
+            let nickAtual = (playerAtual && playerAtual.value && playerAtual.value.nickname) ? playerAtual.value.nickname : (playerAtual && playerAtual.nickname ? playerAtual.nickname : '');
+            let scoreAtual = (playerAtual && playerAtual.value && playerAtual.value.score) ? playerAtual.value.score : (playerAtual && playerAtual.score ? playerAtual.score : '');
+            let skipAtual = (playerAtual && playerAtual.value && playerAtual.value.skipPoints) ? playerAtual.value.skipPoints : (playerAtual && playerAtual.skipPoints ? playerAtual.skipPoints : 0);
+            console.log('[Player Atual]', nickAtual, scoreAtual, skipAtual);    
+            console.log("aqui 0");
+            if (typeof window.showHome === 'function') {
+                console.log("aqui 1");
+                window.showHome(nickAtual, scoreAtual, skipAtual, {});
+            }
+            bloqueioDesafioDuplicado = true;
+            return;
+        }
+    });
 
     function showLoading() {
         if (loading) loading.style.display = "flex";
@@ -233,115 +387,254 @@ document.addEventListener("DOMContentLoaded", function () {
         if (mainContent) mainContent.style.display = "flex";
     }
 
-    function fetchChallenge() {
-        showLoading();
-        const desafio = document.querySelector("#challenge span");
-        const consequencia = document.querySelector("#description span");
-        const footer = document.querySelector("#footer");
+    // function fetchChallenge() {
+    //     // Validação inicial: se não existe player no localStorage, exibe modal de recuperação
+    //     const player = getFromLocalStorage('player');
+    //     if (!player) {
+    //         if (typeof showModalCustom === 'function') {
+    //             showModalCustom('Digite seu telefone para recuperar a pontuação, ou procure uma Tag nova para se cadastrar e começar a jogar');
+    //         } else {
+    //             var modal = document.getElementById("modal-custom");
+    //             var msg = document.getElementById("modal-custom-message");
+    //             if (modal && msg) {
+    //                 msg.textContent = 'Digite seu telefone para recuperar a pontuação, ou procure uma Tag nova para se cadastrar e começar a jogar';
+    //                 modal.style.display = "flex";
+    //             }
+    //         }
+    //         // Esconde conteúdos principais
+    //         var loading = document.getElementById("loading");
+    //         var mainContent = document.getElementById("mainContent");
+    //         if (loading) loading.style.display = 'none';
+    //         if (mainContent) mainContent.style.display = 'none';
+    //         return;
+    //     }
 
-        // Sempre faz a requisição para a API para saber se a tag está cadastrada
-        const newParams = new URLSearchParams({
-            reference: String(baseRef), // envie o baseRef original (1..5) para que o backend entenda o grupo
-            tagID: tagID,
-        });
-        const googleScriptURL = `${url}?${newParams.toString()}`;
+    //     showLoading();
+    //     const desafio = document.querySelector("#challenge span");
+    //     const consequencia = document.querySelector("#description span");
+    //     const footer = document.querySelector("#footer");
 
-        console.log("[TagDoCaos] fetchChallenge chamando API:", googleScriptURL);
+    //     // Sempre faz a requisição para a API para saber se a tag está cadastrada
+    //     const newParams = new URLSearchParams({
+    //         reference: String(baseRef), // envie o baseRef original (1..5) para que o backend entenda o grupo
+    //         tagID: tagID,
+    //     });
+    //     const googleScriptURL = `${url}?${newParams.toString()}`;
 
-        fetch(googleScriptURL)
-            .then((res) => {
-                console.log("[TagDoCaos] resposta HTTP:", res.status);
-                return res.json();
-            })
-            .then((data) => {
-                console.log("[TagDoCaos] resposta JSON:", data);
+    //     console.log("[TagDoCaos] fetchChallenge chamando API:", googleScriptURL);
 
-                // Se o servidor devolve instrução para cadastro
-                if (data.status === "needs_registration" && data.tagID) {
-                    showModalCustom("Preencha seus dados para participar!");
-                    // guarda tag para o modal de registro
-                    if (document.getElementById("modal-nickname")) {
-                        window._tagDoCaosTagID = data.tagID;
-                    }
-                    if (desafio) desafio.textContent = "Cadastro necessário";
-                    if (consequencia) consequencia.textContent = "Informe seus dados para começar.";
-                    if (footer) footer.style.display = "none";
-                    // não chama hideLoading() aqui; o modal vai controlar
-                    return;
+    //     fetch(googleScriptURL)
+    //         .then((res) => {
+    //             console.log("[TagDoCaos] resposta HTTP:", res.status);
+    //             return res.json();
+    //         })
+    //         .then((data) => {
+    //             console.log("[TagDoCaos] resposta JSON:", data);
+
+    //             // Se o servidor devolve instrução para cadastro
+    //             if (data.status === "needs_registration" && data.tagID) {
+    //                 showModalCustom("Preencha seus dados para participar!");
+    //                 // guarda tag para o modal de registro
+    //                 if (document.getElementById("modal-nickname")) {
+    //                     window._tagDoCaosTagID = data.tagID;
+    //                 }
+    //                 if (desafio) desafio.textContent = "Cadastro necessário";
+    //                 if (consequencia) consequencia.textContent = "Informe seus dados para começar.";
+    //                 if (footer) footer.style.display = "none";
+    //                 // não chama hideLoading() aqui; o modal vai controlar
+    //                 return;
+    //             }
+
+    //             // Se registrou/atualizou o player, servidor pode retornar 'player_registered_or_updated' ou 'new_player_registered'
+    //             if ((data.status === "player_registered_or_updated" || data.status === "new_player_registered" || data.status === "registered") && data.player) {
+    //                 // tenta salvar challengeList se veio
+    //                 if (data.challengeList) {
+    //                     saveToLocalStorage('challengeList', data.challengeList);
+    //                 }
+    //                 // salva player e playerphone
+    //                 saveToLocalStorage('player', data.player);
+    //                 if (data.player.phone) saveToLocalStorage('playerphone', data.player.phone);
+    //                 showModalCustom("Você foi registrado! Pronto para os desafios.");
+    //                 if (desafio) desafio.textContent = "Bem-vindo!";
+    //                 if (consequencia) consequencia.textContent = "Você foi registrado.";
+    //                 if (footer) footer.style.display = "none";
+    //                 return;
+    //             }
+
+    //             // Se veio a lista de desafios
+    //             if (data.status === "challengeList" && data.challengeList) {
+    //                 // o servidor devolveu challengeList completo; armazena com timestamp
+    //                 saveToLocalStorage('challengeList', data.challengeList);
+    //                 // pega um item aleatório do grupo 'reference' (use baseRef group logic)
+    //                 const cached = getFromLocalStorage('challengeList');
+    //                 const challengeSet = cached && cached.value ? cached.value : data.challengeList;
+    //                 // observe: data.challengeList keyed by '1'..'5'
+    //                 const group = String(reference); // já foi normalizado
+    //                 const arrayGroup = challengeSet[group] || challengeSet[baseRef] || [];
+    //                 let index = 0;
+    //                 if (arrayGroup.length) index = Math.floor(Math.random() * arrayGroup.length);
+    //                 const item = arrayGroup[index] || {};
+    //                 // Salva o challengedPhone globalmente, se existir
+    //                 if (item.challengedPhone) {
+    //                     window._tagDoCaosChallengedPhone = item.challengedPhone;
+    //                 } else if (item.phone) {
+    //                     window._tagDoCaosChallengedPhone = item.phone;
+    //                 } else {
+    //                     window._tagDoCaosChallengedPhone = '';
+    //                 }
+    //                 if (desafio) desafio.textContent = item.challenge || "Erro ao carregar";
+    //                 if (consequencia) consequencia.textContent = item.description || "Erro ao carregar";
+    //                 if (footer) footer.style.display = item.shareable ? "flex" : "none";
+    //                 hideLoading();
+    //                 return;
+    //             }
+
+    //             // Se devolveu player sem challengeList (por exemplo somente consulta de player)
+    //             if (data.status === "player_found" && data.player) {
+    //                 if (desafio) desafio.textContent = "Player: " + (data.player.nickname || "");
+    //                 if (consequencia) consequencia.textContent = "Score: " + (data.player.score || 0);
+    //                 if (footer) footer.style.display = "none";
+    //                 // não hideLoading() deliberadamente
+    //                 return;
+    //             }
+
+    //             // erro ou inesperado
+    //             if (data.error) {
+    //                 if (desafio) desafio.textContent = "Erro";
+    //                 if (consequencia) consequencia.textContent = data.error;
+    //                 if (footer) footer.style.display = "none";
+    //                 return;
+    //             }
+
+    //             // fallback
+    //             if (desafio) desafio.textContent = "Resposta inesperada";
+    //             if (consequencia) consequencia.textContent = JSON.stringify(data);
+    //             if (footer) footer.style.display = "none";
+    //         })
+    //         .catch((err) => {
+    //             console.error("[TagDoCaos] fetch error:", err);
+    //             showRetry();
+    //         });
+    // }
+function fetchChallenge() {
+    showLoading();
+    const desafio = document.querySelector("#challenge span");
+    const consequencia = document.querySelector("#description span");
+    const footer = document.querySelector("#footer");
+
+    // SEMPRE faz a requisição para a API para saber se a tag está cadastrada
+    // A validação de player foi REMOVIDA daqui e será feita baseada na resposta da API
+    const newParams = new URLSearchParams({
+        reference: String(baseRef), // envie o baseRef original (1..5) para que o backend entenda o grupo
+        tagID: tagID,
+    });
+    const googleScriptURL = `${url}?${newParams.toString()}`;
+
+    console.log("[TagDoCaos] fetchChallenge chamando API:", googleScriptURL);
+
+    fetch(googleScriptURL)
+        .then((res) => {
+            console.log("[TagDoCaos] resposta HTTP:", res.status);
+            return res.json();
+        })
+        .then((data) => {
+            console.log("[TagDoCaos] resposta JSON:", data);
+
+            // Se o servidor devolve instrução para cadastro
+            if (data.status === "needs_registration" && data.tagID) {
+                showModalCustom("Preencha seus dados para participar!");
+                // guarda tag para o modal de registro
+                if (document.getElementById("modal-nickname")) {
+                    window._tagDoCaosTagID = data.tagID;
                 }
+                if (desafio) desafio.textContent = "Cadastro necessário";
+                if (consequencia) consequencia.textContent = "Informe seus dados para começar.";
+                if (footer) footer.style.display = "none";
+                return;
+            }
 
-                // Se registrou/atualizou o player, servidor pode retornar 'player_registered_or_updated' ou 'new_player_registered'
-                if ((data.status === "player_registered_or_updated" || data.status === "new_player_registered" || data.status === "registered") && data.player) {
-                    // tenta salvar challengeList se veio
-                    if (data.challengeList) {
-                        saveToLocalStorage('challengeList', data.challengeList);
-                    }
-                    // salva player e playerphone
+            // AQUI: Se a API retornou challengeList, mas não temos player local,
+            // significa que a tag existe mas perdemos os dados locais
+            if (data.status === "challengeList" && data.challengeList) {
+                const localPlayer = getFromLocalStorage('player');
+                if (!localPlayer && data.player) {
+                    // Salva o player que veio da API
                     saveToLocalStorage('player', data.player);
                     if (data.player.phone) saveToLocalStorage('playerphone', data.player.phone);
-                    showModalCustom("Você foi registrado! Pronto para os desafios.");
-                    if (desafio) desafio.textContent = "Bem-vindo!";
-                    if (consequencia) consequencia.textContent = "Você foi registrado.";
+                } else if (!localPlayer && !data.player) {
+                    // Tag existe mas não temos dados do player - solicita recuperação
+                    showModalCustom('Digite seu telefone para recuperar a pontuação');
+                    if (desafio) desafio.textContent = "Recuperação necessária";
+                    if (consequencia) consequencia.textContent = "Informe seu telefone para recuperar seus dados.";
                     if (footer) footer.style.display = "none";
                     return;
                 }
 
-                // Se veio a lista de desafios
-                if (data.status === "challengeList" && data.challengeList) {
-                    // o servidor devolveu challengeList completo; armazena com timestamp
+                // Processa a lista de desafios normalmente
+                saveToLocalStorage('challengeList', data.challengeList);
+                const cached = getFromLocalStorage('challengeList');
+                const challengeSet = cached && cached.value ? cached.value : data.challengeList;
+                const group = String(reference);
+                const arrayGroup = challengeSet[group] || challengeSet[baseRef] || [];
+                let index = 0;
+                if (arrayGroup.length) index = Math.floor(Math.random() * arrayGroup.length);
+                const item = arrayGroup[index] || {};
+                
+                if (item.challengedPhone) {
+                    window._tagDoCaosChallengedPhone = item.challengedPhone;
+                } else if (item.phone) {
+                    window._tagDoCaosChallengedPhone = item.phone;
+                } else {
+                    window._tagDoCaosChallengedPhone = '';
+                }
+                
+                if (desafio) desafio.textContent = item.challenge || "Erro ao carregar";
+                if (consequencia) consequencia.textContent = item.description || "Erro ao carregar";
+                if (footer) footer.style.display = item.shareable ? "flex" : "none";
+                hideLoading();
+                return;
+            }
+
+            // Se registrou/atualizou o player, servidor pode retornar 'player_registered_or_updated' ou 'new_player_registered'
+            if ((data.status === "player_registered_or_updated" || data.status === "new_player_registered" || data.status === "registered") && data.player) {
+                if (data.challengeList) {
                     saveToLocalStorage('challengeList', data.challengeList);
-                    // pega um item aleatório do grupo 'reference' (use baseRef group logic)
-                    const cached = getFromLocalStorage('challengeList');
-                    const challengeSet = cached && cached.value ? cached.value : data.challengeList;
-                    // observe: data.challengeList keyed by '1'..'5'
-                    const group = String(reference); // já foi normalizado
-                    const arrayGroup = challengeSet[group] || challengeSet[baseRef] || [];
-                    let index = 0;
-                    if (arrayGroup.length) index = Math.floor(Math.random() * arrayGroup.length);
-                    const item = arrayGroup[index] || {};
-                    // Salva o challengedPhone globalmente, se existir
-                    if (item.challengedPhone) {
-                        window._tagDoCaosChallengedPhone = item.challengedPhone;
-                    } else if (item.phone) {
-                        window._tagDoCaosChallengedPhone = item.phone;
-                    } else {
-                        window._tagDoCaosChallengedPhone = '';
-                    }
-                    if (desafio) desafio.textContent = item.challenge || "Erro ao carregar";
-                    if (consequencia) consequencia.textContent = item.description || "Erro ao carregar";
-                    if (footer) footer.style.display = item.shareable ? "flex" : "none";
-                    hideLoading();
-                    return;
                 }
-
-                // Se devolveu player sem challengeList (por exemplo somente consulta de player)
-                if (data.status === "player_found" && data.player) {
-                    if (desafio) desafio.textContent = "Player: " + (data.player.nickname || "");
-                    if (consequencia) consequencia.textContent = "Score: " + (data.player.score || 0);
-                    if (footer) footer.style.display = "none";
-                    // não hideLoading() deliberadamente
-                    return;
-                }
-
-                // erro ou inesperado
-                if (data.error) {
-                    if (desafio) desafio.textContent = "Erro";
-                    if (consequencia) consequencia.textContent = data.error;
-                    if (footer) footer.style.display = "none";
-                    return;
-                }
-
-                // fallback
-                if (desafio) desafio.textContent = "Resposta inesperada";
-                if (consequencia) consequencia.textContent = JSON.stringify(data);
+                saveToLocalStorage('player', data.player);
+                if (data.player.phone) saveToLocalStorage('playerphone', data.player.phone);
+                showModalCustom("Você foi registrado! Pronto para os desafios.");
+                if (desafio) desafio.textContent = "Bem-vindo!";
+                if (consequencia) consequencia.textContent = "Você foi registrado.";
                 if (footer) footer.style.display = "none";
-            })
-            .catch((err) => {
-                console.error("[TagDoCaos] fetch error:", err);
-                showRetry();
-            });
-    }
+                return;
+            }
 
+            // Se devolveu player sem challengeList (por exemplo somente consulta de player)
+            if (data.status === "player_found" && data.player) {
+                if (desafio) desafio.textContent = "Player: " + (data.player.nickname || "");
+                if (consequencia) consequencia.textContent = "Score: " + (data.player.score || 0);
+                if (footer) footer.style.display = "none";
+                return;
+            }
+
+            // erro ou inesperado
+            if (data.error) {
+                if (desafio) desafio.textContent = "Erro";
+                if (consequencia) consequencia.textContent = data.error;
+                if (footer) footer.style.display = "none";
+                return;
+            }
+
+            // fallback
+            if (desafio) desafio.textContent = "Resposta inesperada";
+            if (consequencia) consequencia.textContent = JSON.stringify(data);
+            if (footer) footer.style.display = "none";
+        })
+        .catch((err) => {
+            console.error("[TagDoCaos] fetch error:", err);
+            showRetry();
+        });
+}
     retryBtn && retryBtn.addEventListener("click", function () {
         loadingText.textContent = "Carregando desafio...";
         fetchChallenge();
@@ -501,7 +794,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-    fetchChallenge();
+    const lastChallengedTag = getFromLocalStorage('lastChallengedTagID');
+    // Se não há tagID na URL, sempre permite iniciar (ex: primeira visita ou reset)
+    if (!tagID) {
+        fetchChallenge();
+    } else if (!lastChallengedTag || tagID !== lastChallengedTag.value) {
+        fetchChallenge();
+    }
 });
 
 
@@ -629,9 +928,12 @@ document.addEventListener("DOMContentLoaded", function () {
             register(function (data) {
                 if (data && data.challengeList) {
                     saveToLocalStorage('challengeList', data.challengeList);
+                    hideModalCustom();
+                    showHome(data.player.nickname, data.player.score, data.player.skipPoints);
+                } else {
+                    hideModalCustom();
+                    showHome(nickname, 0, 3);
                 }
-                hideModalCustom();
-                showHome(nickname, 0, 3);
             });
         });
     }
@@ -780,65 +1082,87 @@ document.addEventListener("DOMContentLoaded", function () {
      * @param {object} data
      */
     window.showHome = function(nickname, score, skipPoints, data) {
-        // Esconde todos os conteúdos principais
+        showBoxLoading('player-box', "Carregando dados do jogador..."); // Mostra imediatamente
+        showBoxLoading('ranking-box', "Carregando ranking..."); // Mostra imediatamente
+        // Busca player atualizado antes de exibir a home
+        const playerphone = getFromLocalStorage('playerphone');
+        const phone = playerphone && playerphone.value ? playerphone.value : playerphone;
+        if (phone) {
+            fetchPlayer(phone).then(player => {
+                // Atualiza dados com o player mais recente
+                let nome = (player && player.nickname) ? player.nickname : (typeof nickname === 'string' && nickname.trim() ? nickname : 'Visitante');
+                let pontos = (player && typeof player.score !== 'undefined') ? player.score : (typeof score === 'number' && !isNaN(score) ? score : (parseInt(score) || 0));
+                let skips = (player && typeof player.skipPoints !== 'undefined') ? player.skipPoints : (typeof skipPoints === 'number' && !isNaN(skipPoints) ? skipPoints : (parseInt(skipPoints) || 0));
+                // Exibe a home
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('homeContent').style.display = 'flex';
+                var loading = document.getElementById('loading');
+                if (loading) loading.style.display = 'none';
+                const nicknameLine = document.getElementById('home-nickname');
+                const scoreLine = document.getElementById('home-score');
+                const skipPointsLine = document.getElementById('home-skip-points');
+                const extra = document.getElementById('home-extra');
+                if (data && data.error) {
+                    nicknameLine.textContent = 'erro';
+                    scoreLine.innerHTML = `<span style='color:#c00;'>${data.error}</span>`;
+                    skipPointsLine.innerHTML = 'erro';
+                    extra.innerHTML = 'erro';
+                } else {
+                    nicknameLine.textContent = nome;
+                    scoreLine.innerHTML = `<b>${pontos}</b> pontos`;
+                    skipPointsLine.innerHTML = `<b>${skips}</b> chances de arrego`;
+                    extra.innerHTML = '';
+                }
+                // Busca e exibe ranking
+                const rankingList = document.getElementById('ranking-list');
+                if (rankingList) {
+                    rankingList.innerHTML = '<li style="color:#aaa;">Carregando ranking...</li>';
+                    let ranking = (data && data.ranking) ? data.ranking : null;
+                    if (ranking && Array.isArray(ranking)) {
+                        updateRankingDisplay(ranking, phone);
+                    } else {
+                        fetchRanking(400).then(ranking => {
+                            updateRankingDisplay(ranking, phone);
+                        });
+                    }
+                }
+            });
+            return;
+        }
+        // Caso não tenha telefone, exibe home com dados recebidos
         document.getElementById('mainContent').style.display = 'none';
         document.getElementById('homeContent').style.display = 'flex';
-        // Esconde o loading se estiver visível
         var loading = document.getElementById('loading');
         if (loading) loading.style.display = 'none';
-        // Personaliza mensagem minimalista
         const nicknameLine = document.getElementById('home-nickname');
         const scoreLine = document.getElementById('home-score');
         const skipPointsLine = document.getElementById('home-skip-points');
         const extra = document.getElementById('home-extra');
-        if (nickname && score) {
-            nicknameLine.textContent = nickname;
-            scoreLine.innerHTML = `<b>${score}</b> pontos`;
-            skipPointsLine.innerHTML = `<b>${skipPoints || 0}</b> chances de arrego`;
-            extra.innerHTML = '';
-        } else if (nickname) {
-            nicknameLine.textContent = nickname;
-            scoreLine.innerHTML = `<b>0</b> pontos`;
-            skipPointsLine.innerHTML = `<b>${skipPoints || 0}</b> chances de arrego`;
-            extra.innerHTML = '';
-        } else if (data && data.error) {
-            nicknameLine.textContent = '';
+        let nome = (typeof nickname === 'string' && nickname.trim()) ? nickname : 'Visitante';
+        let pontos = (typeof score === 'number' && !isNaN(score)) ? score : (parseInt(score) || 0);
+        let skips = (typeof skipPoints === 'number' && !isNaN(skipPoints)) ? skipPoints : (parseInt(skipPoints) || 0);
+        if (data && data.error) {
+            nicknameLine.textContent = 'erro';
             scoreLine.innerHTML = `<span style='color:#c00;'>${data.error}</span>`;
-            extra.innerHTML = '';
+            skipPointsLine.innerHTML = 'erro';
+            extra.innerHTML = 'erro';
         } else {
-            nicknameLine.textContent = '';
-            scoreLine.innerHTML = '';
+            nicknameLine.textContent = nome;
+            scoreLine.innerHTML = `<b>${pontos}</b> pontos`;
+            skipPointsLine.innerHTML = `<b>${skips}</b> chances de arrego`;
             extra.innerHTML = '';
         }
-
-        // Exibe ranking se disponível
+        // Busca e exibe ranking
         const rankingList = document.getElementById('ranking-list');
         if (rankingList) {
             rankingList.innerHTML = '<li style="color:#aaa;">Carregando ranking...</li>';
-            // Tenta pegar do data, senão do localStorage
             let ranking = (data && data.ranking) ? data.ranking : null;
-            if (!ranking) {
-                const cached = getFromLocalStorage('ranking');
-                ranking = cached && cached.value ? cached.value : null;
-            }
-            // Se não veio, tenta buscar do player (se for um array)
-            if (!ranking && data && data.player && Array.isArray(data.player.ranking)) {
-                ranking = data.player.ranking;
-            }
-            // Se não veio, tenta buscar do próprio player (se for um array)
-            if (!ranking && window._lastRanking) {
-                ranking = window._lastRanking;
-            }
-            if (Array.isArray(ranking) && ranking.length > 0) {
-                window._lastRanking = ranking;
-                rankingList.innerHTML = '';
-                ranking.slice(0, 10).forEach(function(player, idx) {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span style="font-weight:700;">${player.nickname || 'Player'}</span> <span style="color:#3e5c3a; font-weight:600;">${player.score}</span>` + (player.phone === (data && data.player && data.player.phone) ? ' <span style="color:#0f2d1e; font-size:1.1em;">(você)</span>' : '');
-                    rankingList.appendChild(li);
-                });
+            if (ranking && Array.isArray(ranking)) {
+                updateRankingDisplay(ranking, '');
             } else {
-                rankingList.innerHTML = '<li style="color:#aaa;">Ranking indisponível</li>';
+                fetchRanking(400).then(ranking => {
+                    updateRankingDisplay(ranking, '');
+                });
             }
         }
     }
