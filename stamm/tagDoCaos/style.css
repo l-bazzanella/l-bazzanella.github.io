@@ -1,3 +1,87 @@
+/* Mensagem de fundo do swipe (aceito/arregou) */
+.swipe-message-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin-top: -30vh;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 11001;
+  background: rgba(237,237,237,0.95);
+  font-size: 3rem;
+  font-weight: bold;
+  color: #253727;
+  text-shadow: 0 2px 8px rgba(31,38,135,0.10);
+  pointer-events: none;
+  user-select: none;
+}
+#swipe-undo-circle {
+  position: fixed;
+  top: 50%;
+  left: 50%; 
+  width: 180px;
+  height: 180px;
+  background-color: rgb(64, 139, 68);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 2rem;
+  z-index: 12000;
+  cursor: pointer;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 0 0 8px rgba(37,55,39,0.08);
+  user-select: none;
+  transform: translate(-50%, -50%) scale(0.7);
+  opacity: 0;
+  animation: swipeUndoScaleSoft 5s cubic-bezier(.77,0,.18,1) backwards;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+@keyframes swipeUndoScaleSoft {
+  0% {
+    transform:translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  1% {
+    transform:translate(-50%, -50%) scale(0.5);
+    opacity: 0.05;
+    
+  }
+  10% {
+    transform:translate(-50%, -50%) scale(1.7);
+    opacity: 1;
+  }
+  85% {
+    transform:translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform:translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+}
+
+#swipe-undo-circle .undo-label {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+#swipe-undo-circle .undo-countdown {
+  font-size: 2.7rem;
+  font-weight: bold;
+  line-height: 1;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(31,38,135,0.10);
+}
+
+
 body {
   margin-top: 0;
   margin-left: 10vw;
@@ -37,8 +121,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: fadeOut 1s ease-in-out 3s forwards;
-  z-index: 1;
+  z-index: 11000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(237,237,237,0.85);
 }
 
 .spinner {
@@ -46,8 +135,47 @@ body {
   height: 100px;
   border: 8px solid transparent;
   border-top: 8px solid #0f2d1e;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid transparent;
   border-radius: 50%;
-  animation: spin 4.5s ease-out;
+  animation: spinnerArc 2.5s cubic-bezier(.77,0,.18,1) infinite, spin 1.5s linear infinite;
+}
+
+@keyframes spinnerArc {
+  0% {
+    border-top-color: #0f2d1e;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+  }
+  12.5% {
+    border-right-color: #0f2d1e;
+  }
+  25% {
+    border-bottom-color: #0f2d1e;
+  }
+  37.5% {
+    border-left-color: #0f2d1e;
+  }
+  50% {
+    border-top-color: #0f2d1e;
+    border-right-color: #0f2d1e;
+    border-bottom-color: #0f2d1e;
+    border-left-color: #0f2d1e;
+  }
+  62.5% {
+    border-right-color: transparent;
+  }
+  75% {
+    border-bottom-color: transparent;
+  }
+  87.5% {
+    border-left-color: transparent;
+  }
+  100% {
+    border-top-color: #0f2d1e;
+  }
 }
 
 @keyframes spin {
@@ -90,13 +218,14 @@ body {
   width: 74vw;
   border: 2px solid #253727;
   padding: 10px;
+  background-color: #ffffff7a;
 }
 
 .animated-text span {
   display: unset;
   overflow: hidden; 
   white-space: nowrap;
-  animation: typing 6s steps(30, end);
+  /* animation: typing 6s steps(30, end); */
 }
 
 .logo-tagdocaos{
@@ -116,7 +245,7 @@ body {
   display: flex;
   font-size: smaller;
 }
-
+/* 
 @keyframes typing {
   0% {
     display: inline-block;
@@ -129,9 +258,9 @@ body {
     display: unset;
     width: 100%;
   }
-}
+} */
 
-/* Estilos para o modal */
+/* Estilos para o modal padrão */
 #modal-copied {
   display: none;
   position: fixed;
@@ -147,23 +276,90 @@ body {
 
 #modal-copied > div {
   background: #fff;
-  padding: 2rem;
-  border-radius: 10px;
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  border-radius: 18px;
   text-align: center;
-  max-width: 70vw;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+  border: 1.5px solid #e0e0e0;
+  margin: 1.5rem;
 }
 
 #modal-copied p {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
+  font-size: 1.25rem;
+  margin-bottom: 2.2rem;
+  color: #253727;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 #modal-ok {
-  padding: 0.7rem 2rem;
-  font-size: 1rem;
-  background: #253727;
+  padding: 0.8rem 2.5rem;
+  font-size: 1.1rem;
+  background: linear-gradient(90deg, #253727 60%, #3e5c3a 100%);
   color: #fff;
   border: none;
-  border-radius: 5px;
+  border-radius: 7px;
   cursor: pointer;
+  box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.10);
+  transition: background 0.2s, transform 0.2s;
+  margin-top: 0.5rem;
+}
+#modal-ok:hover {
+  background: linear-gradient(90deg, #3e5c3a 60%, #253727 100%);
+  transform: translateY(-2px) scale(1.04);
+}
+
+/* Modal Parabéns (novo inscrito e recuperação) */
+#modal-parabens {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+#modal-parabens > div {
+  background: #f8faf7;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+  border: 1.5px solid #e0e0e0;
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  margin: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 95vw;
+  min-width: 320px;
+}
+#modal-parabens-message {
+  font-size: 2rem;
+  margin-bottom: 2.2rem;
+  color: #253727;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-align: center;
+  line-height: 1.3;
+  text-shadow: 0 2px 8px rgba(31,38,135,0.04);
+}
+#modal-parabens-ok {
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+  background: linear-gradient(90deg, #253727 60%, #3e5c3a 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.10);
+  transition: background 0.2s, transform 0.2s;
+  margin-top: 0.5rem;
+}
+#modal-parabens-ok:hover {
+  background: linear-gradient(90deg, #3e5c3a 60%, #253727 100%);
+  transform: translateY(-2px) scale(1.04);
 }

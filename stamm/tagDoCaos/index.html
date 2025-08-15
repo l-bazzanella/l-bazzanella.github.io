@@ -5,22 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tag do Caos</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap"
-      rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap"
+    rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- Mensagem de fundo do swipe (aceito/arregou) -->
+    <div id="swipe-message-bg" class="swipe-message-bg" style="display:none;"></div>
     <div class="background-image"></div>
 
     <div class="spinner-container" id="loading">
       <div class="spinner" id="spinner"></div>
-      <p id="loading-text">Carregando desafio...</p>
+      <p id="loading-text">...</p>
       <button id="retry-btn" style="display:none; padding:0.7rem 2rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer;">Tentar novamente</button>
     </div>
 
+    <img class="logo-tagdocaos" src="https://i.ibb.co/WvG4RFSj/Logo-Tag-Do-Caos.png" alt="logo" />
     <div class="content" id="mainContent">
-      <img class="logo-tagdocaos" src="https://i.ibb.co/WvG4RFSj/Logo-Tag-Do-Caos.png" alt="logo" />
       <div class="box">
         <p style="height: 20vh;">
           <strong>Desafio</strong><br/><br/>
@@ -41,6 +43,19 @@
       </div>
     </div>
 
+    <!-- HOME DIV -->
+    <div class="content" id="homeContent" style="display:none; flex-direction:column; align-items:center; justify-content:center; min-height:60vh;">
+      <div class="box" style="margin-bottom:2rem; min-width:260px; background: #ffffff7a; box-shadow: 0 4px 18px 0 rgba(31,38,135,0.08); padding: 2.5rem 2rem 2rem 2rem;">
+        <h2 id="home-welcome" style="font-size:2.3rem; margin-bottom:0.7rem; color:#253727; text-align:center; letter-spacing:0.01em;"></h2>
+        <p id="home-message" style="font-size:2rem; color:#3e5c3a; margin-bottom:1.2rem; text-align:center; font-weight:700;"></p>
+        <div id="home-extra" style="font-size:1.1rem; color:#253727; text-align:center; margin-bottom:1.2rem;"></div>
+      </div>
+      <div class="box" id="ranking-box" style="background: #ffffff7a; box-shadow: 0 2px 8px 0 rgba(31,38,135,0.06); padding: 1.5rem 1rem 1.2rem 1rem; min-width:260px; max-width:400px; margin-bottom:1.5rem;">
+        <h3 style="font-size:1.3rem; color:#253727; margin-bottom:1rem; text-align:center; letter-spacing:0.01em;">Ranking</h3>
+        <ol id="ranking-list" style="list-style:decimal inside; padding:0; margin:0; font-size:1.1rem; color:#253727;"></ol>
+      </div>
+    </div>
+
     <!-- Modal -->
     <div id="modal-copied" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
       <div style="background:#fff; padding:2rem; border-radius:10px; text-align:center; max-width:90vw;">
@@ -54,9 +69,19 @@
       <div style="background:#fff; padding:2rem; border-radius:10px; text-align:center; max-width:90vw;">
         <p id="modal-custom-message" style="font-size:1.2rem; margin-bottom:2rem;">Mensagem customizada</p>
         <div id="modal-custom-error" style="color:#c00; font-size:1rem; margin-bottom:1rem;"></div>
-        <input id="modal-nickname" type="text" placeholder="Seu nickname" style="display:block; width:100%; margin-bottom:1rem; padding:0.5rem; font-size:1rem; border:1px solid #ccc; border-radius:5px;" />
-        <input id="modal-phone" type="text" inputmode="numeric" pattern="\\d*" maxlength="11" placeholder="Seu telefone" style="display:block; width:100%; margin-bottom:2rem; padding:0.5rem; font-size:1rem; border:1px solid #ccc; border-radius:5px;" />
-        <button id="modal-custom-ok" style="padding:0.7rem 2rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer;">OK</button>
+        <div id="modal-custom-options">
+          <button id="modal-custom-new" style="padding:0.7rem 2rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer; margin-bottom:1rem;">Novo participante</button>
+          <button id="modal-custom-recover" style="padding:0.7rem 2rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer;">Recuperar pontuação</button>
+        </div>
+        <div id="modal-custom-form-new" style="display:none;">
+          <input id="modal-nickname" type="text" placeholder="Seu nickname" style="display:block; width:100%; margin-bottom:1rem; padding:0.5rem; font-size:1rem; border:1px solid #ccc; border-radius:5px;" />
+          <input id="modal-phone" type="text" inputmode="numeric" pattern="\d*" maxlength="11" placeholder="Seu telefone" style="display:block; width:100%; margin-bottom:2rem; padding:0.5rem; font-size:1rem; border:1px solid #ccc; border-radius:5px;" />
+          <button id="modal-custom-ok-new" style="padding:0.7rem 2rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer;">OK</button>
+        </div>
+        <div id="modal-custom-form-recover" style="display:none;">
+          <input id="modal-phone-recover" type="text" inputmode="numeric" pattern="\d*" maxlength="11" placeholder="Seu telefone" style="display:block; width:100%; margin-bottom:2rem; padding:0.5rem; font-size:1rem; border:1px solid #ccc; border-radius:5px;" />
+          <button id="modal-custom-ok-recover" style="padding:0.7rem 2rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:5px; cursor:pointer;">OK</button>
+        </div>
       </div>
     </div>
 
@@ -68,6 +93,14 @@
       </div>
     </div>
 
+    <!-- Modal de Confirmação de Swipe -->
+    <div id="modal-swipe-confirm" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:12000; justify-content:center; align-items:center;">
+      <div style="background:#fff; padding:2rem 2.5rem; border-radius:14px; text-align:center; max-width:90vw; min-width:220px; box-shadow:0 8px 32px 0 rgba(31,38,135,0.18);">
+        <p id="modal-swipe-message" style="font-size:1.3rem; margin-bottom:2rem; color:#253727;"></p>
+        <button id="modal-swipe-confirm-btn" style="padding:0.7rem 0.8rem; font-size:1rem; background:#253727; color:#fff; border:none; border-radius:6px; cursor:pointer;">Confirmar</button>
+        <button id="modal-swipe-cancel-btn" style="padding:0.7rem 0.8rem; font-size:1rem; background:#ccc; color:#253727; border:none; border-radius:6px; cursor:pointer;">Cancelar</button>
+      </div>
+    </div>
     <script src="script.js"></script>
   </body>
 </html>
