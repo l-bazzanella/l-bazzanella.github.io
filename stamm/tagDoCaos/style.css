@@ -279,16 +279,36 @@ body {
 }
 
 .insta-tagdocaos {
-  height: 80px;
-  border-radius: 50%;
+  color: white !important;
+  font-size: smaller;
+  padding: 0.2rem 1.2rem 0.2rem 1.2rem;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(270deg, #f9ce34, #ee2a7b, #6228d7, #ee2a7b, #f9ce34);
+  background-size: 400% 400%;
+  animation: insta-gradient 7s ease-in-out infinite;
+  box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.10);
+}
+
+@keyframes insta-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .insta-footer-tagdocaos {
-  text-align: left;
-  width: 100%;
-  align-items: flex-start;
-  display: flex;
-  font-size: smaller;
+text-align: left;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    font-size: smaller;
 }
 /* 
 @keyframes typing {
