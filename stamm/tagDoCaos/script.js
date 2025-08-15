@@ -205,11 +205,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const player = getFromLocalStorage('player');
         let nickname = (player && player.value && player.value.nickname) ? player.value.nickname : (player && player.nickname ? player.nickname : '');
         let score = (player && player.value && player.value.score) ? player.value.score : (player && player.score ? player.score : '');
+        let skipPoints = (player && player.value && player.value.skipPoints) ? player.value.skipPoints : (player && player.skipPoints ? player.skipPoints : 0);
         // Esconde o loading e mostra home
         if (loading) loading.style.display = 'none';
         if (mainContent) mainContent.style.display = 'none';
         document.getElementById('homeContent').style.display = 'flex';
-        showHome(nickname, score, {});
+        showHome(nickname, score, skipPoints, {});
         return;
     } else if (tagID) {
         // Salva o novo tagID como último desafiado
