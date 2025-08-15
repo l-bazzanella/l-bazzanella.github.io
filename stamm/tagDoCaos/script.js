@@ -205,6 +205,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const player = getFromLocalStorage('player');
         let nickname = (player && player.value && player.value.nickname) ? player.value.nickname : (player && player.nickname ? player.nickname : '');
         let score = (player && player.value && player.value.score) ? player.value.score : (player && player.score ? player.score : '');
+        // Esconde o loading e mostra home
+        if (loading) loading.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'none';
+        document.getElementById('homeContent').style.display = 'flex';
         showHome(nickname, score, {});
         return;
     } else if (tagID) {
