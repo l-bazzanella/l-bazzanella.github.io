@@ -128,8 +128,9 @@ function handleSwipeChallenge(function_, challengerPhone, tagID) {
                 const player = getFromLocalStorage('player');
                 let nickname = (player && player.value && player.value.nickname) ? player.value.nickname : (player && player.nickname ? player.nickname : '');
                 let score = (player && player.value && player.value.score) ? player.value.score : (player && player.score ? player.score : '');
+                let skipPoints = (player && player.value && player.value.skipPoints) ? player.value.skipPoints : (player && player.skipPoints ? player.skipPoints : '');
                 if (typeof showHome === 'function') {
-                    showHome(nickname, score, {});
+                    showHome(nickname, score, skipPoints, {});
                 } else {
                     window.location.reload();
                 }
@@ -611,7 +612,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     saveToLocalStorage('challengeList', data.challengeList);
                 }
                 hideModalCustom();
-                showHome(nickname);
+                showHome(nickname, 0, 3);
             });
         });
     }
@@ -626,7 +627,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (modalParabensOk) {
         modalParabensOk.addEventListener('click', function () {
             document.getElementById('modal-parabens').style.display = 'none';
-            showHome();
+            showHome(nickname, score, skipPoints);
         });
     }
 
@@ -676,11 +677,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         hideModalCustom();
                         let nickname = (data.player && data.player.nickname) ? data.player.nickname : '';
                         let score = (data.player && data.player.score) ? data.player.score : '';
-                        showHome(nickname, score, data);
+                        let skipPoints = (data.player && data.player.skipPoints) ? data.player.skipPoints : '';
+                        showHome(nickname, score, skipPoints);
                     })
                     .catch((err) => {
                         hideModalCustom();
-                        showHome('', '', { error: 'Erro ao recuperar pontuação.' });
+                        showHome('', '', 0, { error: 'Erro ao recuperar pontuação.' });
                     });
             } else {
                 // Se não tem dados, mostra o campo para digitar telefone normalmente
@@ -733,11 +735,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     hideModalCustom();
                     let nickname = (data.player && data.player.nickname) ? data.player.nickname : '';
                     let score = (data.player && data.player.score) ? data.player.score : '';
-                    showHome(nickname, score, data);
+                    let skipPoints = (data.player && data.player.skipPoints) ? data.player.skipPoints : '';
+                    showHome(nickname, score, skipPoints);
                 })
                 .catch((err) => {
                     hideModalCustom();
-                    showHome('', '', { error: 'Erro ao recuperar pontuação.' });
+                    showHome('', '', 0, { error: 'Erro ao recuperar pontuação.' });
                 });
         });
     }
@@ -757,7 +760,7 @@ document.addEventListener("DOMContentLoaded", function () {
      * @param {string|number} score
      * @param {object} data
      */
-    window.showHome = function(nickname, score, data) {
+    window.showHome = function(nickname, score, skipPoints, data) {
         // Esconde todos os conteúdos principais
         document.getElementById('mainContent').style.display = 'none';
         document.getElementById('homeContent').style.display = 'flex';
@@ -765,24 +768,27 @@ document.addEventListener("DOMContentLoaded", function () {
         var loading = document.getElementById('loading');
         if (loading) loading.style.display = 'none';
         // Personaliza mensagem minimalista
-        const welcome = document.getElementById('home-welcome');
-        const msg = document.getElementById('home-message');
+        const nicknameLine = document.getElementById('home-nickname');
+        const scoreLine = document.getElementById('home-score');
+        const skipPointsLine = document.getElementById('home-skip-points');
         const extra = document.getElementById('home-extra');
         if (nickname && score) {
-            welcome.textContent = nickname;
-            msg.innerHTML = `<b>${score}</b> pontos`;
+            nicknameLine.textContent = nickname;
+            scoreLine.innerHTML = `<b>${score}</b> pontos`;
+            skipPointsLine.innerHTML = `<b>${skipPoints || 0}</b> chances de arrego`;
             extra.innerHTML = '';
         } else if (nickname) {
-            welcome.textContent = nickname;
-            msg.innerHTML = `<b>0</b> pontos`;
+            nicknameLine.textContent = nickname;
+            scoreLine.innerHTML = `<b>0</b> pontos`;
+            skipPointsLine.innerHTML = `<b>${skipPoints || 0}</b> chances de arrego`;
             extra.innerHTML = '';
         } else if (data && data.error) {
-            welcome.textContent = '';
-            msg.innerHTML = `<span style='color:#c00;'>${data.error}</span>`;
+            nicknameLine.textContent = '';
+            scoreLine.innerHTML = `<span style='color:#c00;'>${data.error}</span>`;
             extra.innerHTML = '';
         } else {
-            welcome.textContent = '';
-            msg.innerHTML = '';
+            nicknameLine.textContent = '';
+            scoreLine.innerHTML = '';
             extra.innerHTML = '';
         }
 
