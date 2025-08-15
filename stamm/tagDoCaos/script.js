@@ -198,6 +198,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const loadingText = document.getElementById("loading-text");
     const retryBtn = document.getElementById("retry-btn");
 
+    // --- BLOQUEIO DE DESAFIO DUPLICADO ---
+    const lastChallengedTag = getFromLocalStorage('lastChallengedTagID');
+    if (tagID && lastChallengedTag && lastChallengedTag.value === tagID) {
+        // Se tentar desafiar o mesmo player, permanece na home
+        const player = getFromLocalStorage('player');
+        let nickname = (player && player.value && player.value.nickname) ? player.value.nickname : (player && player.nickname ? player.nickname : '');
+        let score = (player && player.value && player.value.score) ? player.value.score : (player && player.score ? player.score : '');
+        showHome(nickname, score, {});
+        return;
+    } else if (tagID) {
+        // Salva o novo tagID como último desafiado
+        saveToLocalStorage('lastChallengedTagID', tagID);
+    }
+
     function showLoading() {
         if (loading) loading.style.display = "flex";
         if (spinner) spinner.style.display = "block";
