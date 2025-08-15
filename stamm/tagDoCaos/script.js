@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (modalOk) {
         modalOk.addEventListener("click", function () {
             modal.style.display = "none";
-            window.open("https://www.instagram.com", "_blank");
+            window.open("https://www.instagram.com/s/aGlnaGxpZ2h0OjE3OTIwNDU5MTAxMTEyMTk1", "_blank");
         });
     }
 });
