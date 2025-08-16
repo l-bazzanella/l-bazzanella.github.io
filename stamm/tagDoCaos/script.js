@@ -329,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (modalOk) {
         modalOk.addEventListener("click", function () {
             modal.style.display = "none";
-            window.open("https://www.instagram.com/s/aGlnaGxpZ2h0OjE3OTIwNDU5MTAxMTEyMTk1", "_blank");
+            window.open("https://www.instagram.com/s/aGlnaGxpZ2h0OjE3OTIwNDU5MTAxMTEyMTk1?story_media_id=3699902489282174044_7922687202&igsh=MTg5cWJxdXlxZDJmNQ==", "_blank");
         });
     }
 });
