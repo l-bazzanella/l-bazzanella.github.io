@@ -260,10 +260,16 @@ body {
 }
 
 .box {
-  border: 2px solid #253727;
-  padding: 10px;
-  background-color: #ffffff7a;
-  box-sizing: border-box;
+    border: 2px solid #253727;
+    padding: 10px;
+    background-color: #ffffff9c;
+    box-sizing: border-box;
+    width: 80vw;
+    background-image: url(cardbg.png);
+    background-size: contain;
+    background-blend-mode: lighten;
+    background-position: bottom;
+    background-repeat: no-repeat;
 }
 
 .animated-text span {

@@ -252,11 +252,7 @@ function handleSwipeChallenge(function_, challengerPhone, tagID) {
     const googleScriptURL = `${url}?${newParams.toString()}`;
     // Esconde a mensagem de swipe imediatamente
     hideSwipeMessage();
-    // Mostra o loading até a home ser aberta
-    var loading = document.getElementById('loading');
-    if (loading) loading.style.display = 'flex';
-    var mainContent = document.getElementById('mainContent');
-    if (mainContent) mainContent.style.display = 'none';
+    showLoading();
     fetch(googleScriptURL)
         .then(res => res.json())
         .then(data => {
@@ -287,6 +283,32 @@ function handleSwipeChallenge(function_, challengerPhone, tagID) {
             alert('Erro ao processar desafio.');
         });
 }
+
+    /**
+     * Exibe o loading global e oculta o mainContent
+     */
+    /**
+ * Exibe o loading global e oculta o mainContent
+ */
+function showLoading() {
+    var loading = document.getElementById('loading');
+    var spinner = document.getElementById('spinner');
+    var loadingText = document.getElementById('loading-text');
+    var retryBtn = document.getElementById('retry-btn');
+    var mainContent = document.getElementById('mainContent');
+    
+    if (loading) loading.style.display = "flex";
+    if (spinner) spinner.style.display = "block";
+    if (loadingText) loadingText.style.display = "block";
+    if (retryBtn) retryBtn.style.display = "none";
+    if (mainContent) mainContent.style.display = "none";
+}
+
+function hideLoading() {
+    var loading = document.getElementById('loading');
+    if (loading) loading.style.display = "none";
+}
+
 // =====================
 
 /**
@@ -371,12 +393,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    function showLoading() {
-        if (loading) loading.style.display = "flex";
-        if (spinner) spinner.style.display = "block";
-        if (loadingText) loadingText.style.display = "block";
-        if (retryBtn) retryBtn.style.display = "none";
-    }
+    // Usa a função global showLoading()
     function showRetry() {
         if (spinner) spinner.style.display = "none";
         if (loadingText) loadingText.textContent = "Erro ao carregar desafio.";
@@ -387,139 +404,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (mainContent) mainContent.style.display = "flex";
     }
 
-    // function fetchChallenge() {
-    //     // Validação inicial: se não existe player no localStorage, exibe modal de recuperação
-    //     const player = getFromLocalStorage('player');
-    //     if (!player) {
-    //         if (typeof showModalCustom === 'function') {
-    //             showModalCustom('Digite seu telefone para recuperar a pontuação, ou procure uma Tag nova para se cadastrar e começar a jogar');
-    //         } else {
-    //             var modal = document.getElementById("modal-custom");
-    //             var msg = document.getElementById("modal-custom-message");
-    //             if (modal && msg) {
-    //                 msg.textContent = 'Digite seu telefone para recuperar a pontuação, ou procure uma Tag nova para se cadastrar e começar a jogar';
-    //                 modal.style.display = "flex";
-    //             }
-    //         }
-    //         // Esconde conteúdos principais
-    //         var loading = document.getElementById("loading");
-    //         var mainContent = document.getElementById("mainContent");
-    //         if (loading) loading.style.display = 'none';
-    //         if (mainContent) mainContent.style.display = 'none';
-    //         return;
-    //     }
-
-    //     showLoading();
-    //     const desafio = document.querySelector("#challenge span");
-    //     const consequencia = document.querySelector("#description span");
-    //     const footer = document.querySelector("#footer");
-
-    //     // Sempre faz a requisição para a API para saber se a tag está cadastrada
-    //     const newParams = new URLSearchParams({
-    //         reference: String(baseRef), // envie o baseRef original (1..5) para que o backend entenda o grupo
-    //         tagID: tagID,
-    //     });
-    //     const googleScriptURL = `${url}?${newParams.toString()}`;
-
-    //     console.log("[TagDoCaos] fetchChallenge chamando API:", googleScriptURL);
-
-    //     fetch(googleScriptURL)
-    //         .then((res) => {
-    //             console.log("[TagDoCaos] resposta HTTP:", res.status);
-    //             return res.json();
-    //         })
-    //         .then((data) => {
-    //             console.log("[TagDoCaos] resposta JSON:", data);
-
-    //             // Se o servidor devolve instrução para cadastro
-    //             if (data.status === "needs_registration" && data.tagID) {
-    //                 showModalCustom("Preencha seus dados para participar!");
-    //                 // guarda tag para o modal de registro
-    //                 if (document.getElementById("modal-nickname")) {
-    //                     window._tagDoCaosTagID = data.tagID;
-    //                 }
-    //                 if (desafio) desafio.textContent = "Cadastro necessário";
-    //                 if (consequencia) consequencia.textContent = "Informe seus dados para começar.";
-    //                 if (footer) footer.style.display = "none";
-    //                 // não chama hideLoading() aqui; o modal vai controlar
-    //                 return;
-    //             }
-
-    //             // Se registrou/atualizou o player, servidor pode retornar 'player_registered_or_updated' ou 'new_player_registered'
-    //             if ((data.status === "player_registered_or_updated" || data.status === "new_player_registered" || data.status === "registered") && data.player) {
-    //                 // tenta salvar challengeList se veio
-    //                 if (data.challengeList) {
-    //                     saveToLocalStorage('challengeList', data.challengeList);
-    //                 }
-    //                 // salva player e playerphone
-    //                 saveToLocalStorage('player', data.player);
-    //                 if (data.player.phone) saveToLocalStorage('playerphone', data.player.phone);
-    //                 showModalCustom("Você foi registrado! Pronto para os desafios.");
-    //                 if (desafio) desafio.textContent = "Bem-vindo!";
-    //                 if (consequencia) consequencia.textContent = "Você foi registrado.";
-    //                 if (footer) footer.style.display = "none";
-    //                 return;
-    //             }
-
-    //             // Se veio a lista de desafios
-    //             if (data.status === "challengeList" && data.challengeList) {
-    //                 // o servidor devolveu challengeList completo; armazena com timestamp
-    //                 saveToLocalStorage('challengeList', data.challengeList);
-    //                 // pega um item aleatório do grupo 'reference' (use baseRef group logic)
-    //                 const cached = getFromLocalStorage('challengeList');
-    //                 const challengeSet = cached && cached.value ? cached.value : data.challengeList;
-    //                 // observe: data.challengeList keyed by '1'..'5'
-    //                 const group = String(reference); // já foi normalizado
-    //                 const arrayGroup = challengeSet[group] || challengeSet[baseRef] || [];
-    //                 let index = 0;
-    //                 if (arrayGroup.length) index = Math.floor(Math.random() * arrayGroup.length);
-    //                 const item = arrayGroup[index] || {};
-    //                 // Salva o challengedPhone globalmente, se existir
-    //                 if (item.challengedPhone) {
-    //                     window._tagDoCaosChallengedPhone = item.challengedPhone;
-    //                 } else if (item.phone) {
-    //                     window._tagDoCaosChallengedPhone = item.phone;
-    //                 } else {
-    //                     window._tagDoCaosChallengedPhone = '';
-    //                 }
-    //                 if (desafio) desafio.textContent = item.challenge || "Erro ao carregar";
-    //                 if (consequencia) consequencia.textContent = item.description || "Erro ao carregar";
-    //                 if (footer) footer.style.display = item.shareable ? "flex" : "none";
-    //                 hideLoading();
-    //                 return;
-    //             }
-
-    //             // Se devolveu player sem challengeList (por exemplo somente consulta de player)
-    //             if (data.status === "player_found" && data.player) {
-    //                 if (desafio) desafio.textContent = "Player: " + (data.player.nickname || "");
-    //                 if (consequencia) consequencia.textContent = "Score: " + (data.player.score || 0);
-    //                 if (footer) footer.style.display = "none";
-    //                 // não hideLoading() deliberadamente
-    //                 return;
-    //             }
-
-    //             // erro ou inesperado
-    //             if (data.error) {
-    //                 if (desafio) desafio.textContent = "Erro";
-    //                 if (consequencia) consequencia.textContent = data.error;
-    //                 if (footer) footer.style.display = "none";
-    //                 return;
-    //             }
-
-    //             // fallback
-    //             if (desafio) desafio.textContent = "Resposta inesperada";
-    //             if (consequencia) consequencia.textContent = JSON.stringify(data);
-    //             if (footer) footer.style.display = "none";
-    //         })
-    //         .catch((err) => {
-    //             console.error("[TagDoCaos] fetch error:", err);
-    //             showRetry();
-    //         });
-    // }
 function fetchChallenge() {
     showLoading();
-    const desafio = document.querySelector("#challenge span");
-    const consequencia = document.querySelector("#description span");
+    const desafio = document.querySelector("#challenge div");
+    const consequencia = document.querySelector("#description div");
     const footer = document.querySelector("#footer");
 
     // SEMPRE faz a requisição para a API para saber se a tag está cadastrada
@@ -588,8 +476,25 @@ function fetchChallenge() {
                     window._tagDoCaosChallengedPhone = '';
                 }
                 
-                if (desafio) desafio.textContent = item.challenge || "Erro ao carregar";
-                if (consequencia) consequencia.textContent = item.description || "Erro ao carregar";
+                // Função para converter <br> em quebras de linha HTML
+                function convertBrToLineBreaks(text) {
+                    if (!text) return '';
+                    const div = document.createElement('div');
+                    text = text.replace(/<br>/gi, '\n'); // Substitui <br> por \n
+                    div.textContent = text; // Usa textContent para escapar HTML
+                    return div.textContent;
+                }
+
+                if (desafio) {
+                    const challengeText = convertBrToLineBreaks(item.challenge);
+                    desafio.style.whiteSpace = 'pre-wrap'; // Preserva quebras de linha
+                    desafio.textContent = challengeText || "Erro ao carregar";
+                }
+                if (consequencia) {
+                    const descriptionText = convertBrToLineBreaks(item.description);
+                    consequencia.style.whiteSpace = 'pre-wrap'; // Preserva quebras de linha
+                    consequencia.textContent = descriptionText || "Erro ao carregar";
+                }
                 if (footer) footer.style.display = item.shareable ? "flex" : "none";
                 hideLoading();
                 return;
@@ -856,6 +761,7 @@ function register(callback) {
         phone: phone,
     });
     const googleScriptURL = `${url}?${newParams.toString()}`;
+    showLoading();
     fetch(googleScriptURL)
         .then((res) => res.json())
         .then((data) => {
@@ -981,8 +887,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     phone: phoneValue
                 });
                 const googleScriptURL = `${url}?${newParams.toString()}`;
-                // Mostra loading
                 showModalCustom("Recuperando pontuação...");
+                showLoading();
                 fetch(googleScriptURL)
                     .then((res) => res.json())
                     .then((data) => {
@@ -1018,6 +924,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnOkRecuperar = document.getElementById("modal-custom-ok-recover");
     if (btnOkRecuperar) {
         btnOkRecuperar.addEventListener("click", function () {
+            showLoading();
             const phoneInput = document.getElementById("modal-phone-recover");
             phoneInput.value = phoneInput.value.replace(/\D/g, "");
             const phone = phoneInput.value;
