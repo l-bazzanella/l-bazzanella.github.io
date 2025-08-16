@@ -500,6 +500,10 @@ function fetchChallenge() {
                 return;
             }
 
+
+
+            
+
             // Se registrou/atualizou o player, servidor pode retornar 'player_registered_or_updated' ou 'new_player_registered'
             if ((data.status === "player_registered_or_updated" || data.status === "new_player_registered" || data.status === "registered") && data.player) {
                 if (data.challengeList) {
